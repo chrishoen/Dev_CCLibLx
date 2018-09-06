@@ -8,7 +8,7 @@
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-
+#if 0
 struct LFIndex
 {  
    short int mIndex;  
@@ -26,6 +26,25 @@ struct LFIndex
       mCount = aCount;
    }
 } __attribute__((aligned(4)));
+#endif
+
+typedef struct __attribute__((aligned(4))) LFIndex
+{
+   short int mIndex;
+   short int mCount;
+
+   LFIndex() noexcept
+   {
+      mIndex = 0;
+      mCount = 0;
+   }
+
+   LFIndex(short int aIndex, short int aCount) noexcept
+   {
+      mIndex = aIndex;
+      mCount = aCount;
+   }
+} LFIndex;
 
 inline bool operator==(const LFIndex& lhs, const LFIndex& rhs)
 {
