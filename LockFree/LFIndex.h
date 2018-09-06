@@ -8,8 +8,9 @@
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-#if 0
-struct LFIndex
+
+#pragma pack(push,1)
+typedef struct alignas(4) LFIndex
 {  
    short int mIndex;  
    short int mCount;  
@@ -25,26 +26,12 @@ struct LFIndex
       mIndex = aIndex;
       mCount = aCount;
    }
-} __attribute__((aligned(4)));
-#endif
-
-typedef struct __attribute__((aligned(4))) LFIndex
-{
-   short int mIndex;
-   short int mCount;
-
-   LFIndex() noexcept
-   {
-      mIndex = 0;
-      mCount = 0;
-   }
-
-   LFIndex(short int aIndex, short int aCount) noexcept
-   {
-      mIndex = aIndex;
-      mCount = aCount;
-   }
 } LFIndex;
+#pragma pack(pop)
+
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
 
 inline bool operator==(const LFIndex& lhs, const LFIndex& rhs)
 {
