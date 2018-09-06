@@ -1,66 +1,33 @@
-#pragma once
-
-/*==============================================================================
-Program command line executive.
-==============================================================================*/
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
+#ifndef _CMDLINEEXEC_H_
+#define _CMDLINEEXEC_H_
 
 #include "risCmdLineExec.h"
 
 //******************************************************************************
+// specific command line executive
 //******************************************************************************
-//******************************************************************************
-// This class is the program command line executive. It processes user
-// command line inputs and executes them. It inherits from the command line
-// command executive base class, which provides an interface for executing
-// command line commands. It provides an override execute function that is
-// called by a console executive when it receives a console command line input.
-// The execute function then executes the command.
 
 class CmdLineExec : public Ris::BaseCmdLineExec
 {
 public:
 
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Members.
+  CmdLineExec();
 
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Infrastructure.
+  void reset();
+  void execute(Ris::CmdLineCmd* aCmd);
 
-   CmdLineExec();
-   void reset();
+  void executeGo1(Ris::CmdLineCmd* aCmd);
+  void executeGo2(Ris::CmdLineCmd* aCmd);
+  void executeGo3(Ris::CmdLineCmd* aCmd);
+  void executeRun(Ris::CmdLineCmd* aCmd);
 
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Methods.
+  void executeShow     (Ris::CmdLineCmd* aCmd);
+  void executeWriteInt (Ris::CmdLineCmd* aCmd);
+  void executeReadInt  (Ris::CmdLineCmd* aCmd);
 
-   // Base class override. Execute a command line command. It calls one of
-   // the following specific command execution functions. This is called by
-   // the owner of this object to pass command line commands to it. 
-   void execute(Ris::CmdLineCmd* aCmd) override;
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Methods.
-
-   // Execute specific commands.
-   void executeGo1(Ris::CmdLineCmd* aCmd);
-   void executeGo2(Ris::CmdLineCmd* aCmd);
-   void executeGo3(Ris::CmdLineCmd* aCmd);
-   void executeGo4(Ris::CmdLineCmd* aCmd);
-   void executeGo5(Ris::CmdLineCmd* aCmd);
+  int mCount;
 };
 
 //******************************************************************************
-//******************************************************************************
-//******************************************************************************
+#endif
 

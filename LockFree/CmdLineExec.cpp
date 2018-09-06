@@ -1,89 +1,101 @@
 #include "stdafx.h"
 
+#include "prnPrint.h"
+#include "LFIndex.h"
+#include "LFIntQueue.h"
+
 #include "CmdLineExec.h"
 
-//******************************************************************************
-//******************************************************************************
+using namespace std;
+
 //******************************************************************************
 
 CmdLineExec::CmdLineExec()
 {
+   mCount=0;
+   LFIntQueue::initialize(4);
 }
+
+//******************************************************************************
 
 void CmdLineExec::reset()
 {
+   for (int i=0;i<100;i++) printf("\n");
+   mCount=0;
+   LFIntQueue::initialize(4);
 }
 
 //******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// This class is the program command line executive. It processes user
-// command line inputs and executes them. It inherits from the command line
-// command executive base class, which provides an interface for executing
-// command line commands. It provides an override execute function that is
-// called by a console executive when it receives a console command line input.
-// The execute function then executes the command.
-
 void CmdLineExec::execute(Ris::CmdLineCmd* aCmd)
 {
-   if(aCmd->isCmd("RESET"  ))  reset();
-   if(aCmd->isCmd("GO1"    ))  executeGo1(aCmd);
-   if(aCmd->isCmd("GO2"    ))  executeGo2(aCmd);
-   if(aCmd->isCmd("GO3"    ))  executeGo3(aCmd);
-   if(aCmd->isCmd("GO4"    ))  executeGo4(aCmd);
-   if(aCmd->isCmd("GO5"    ))  executeGo5(aCmd);
+   if(aCmd->isCmd("RES"    ))  reset();
+   if(aCmd->isCmd("GO1"    ))  executeGo1        (aCmd);
+   if(aCmd->isCmd("GO2"    ))  executeGo2        (aCmd);
+   if(aCmd->isCmd("GO3"    ))  executeGo3        (aCmd);
+   if(aCmd->isCmd("RUN"    ))  executeRun        (aCmd);
+   if(aCmd->isCmd("SHOW"   ))  executeShow       (aCmd);
+   if(aCmd->isCmd("W"      ))  executeWriteInt   (aCmd);
+   if(aCmd->isCmd("R"      ))  executeReadInt    (aCmd);
 }
 
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-
-//******************************************************************************
-//******************************************************************************
 //******************************************************************************
 
 void CmdLineExec::executeGo1(Ris::CmdLineCmd* aCmd)
 {
-   aCmd->setArgDefault(1,10);
-   aCmd->setArgDefault(2,11.1);
-
-   int    tInt    = aCmd->argInt(1);
-   double tDouble = aCmd->argDouble(2);
-
-   Prn::print(0,"Show2 %d %10.6f",tInt,tDouble);
+   Prn::print(0,"%d",sizeof(AtomicLFIndexBlock));;
 }
 
-//******************************************************************************
-//******************************************************************************
 //******************************************************************************
 
 void CmdLineExec::executeGo2(Ris::CmdLineCmd* aCmd)
 {
-  
 }
 
-//******************************************************************************
-//******************************************************************************
 //******************************************************************************
 
 void CmdLineExec::executeGo3(Ris::CmdLineCmd* aCmd)
 {
-  
 }
 
 //******************************************************************************
-//******************************************************************************
-//******************************************************************************
 
-void CmdLineExec::executeGo4(Ris::CmdLineCmd* aCmd)
+void CmdLineExec::executeRun(Ris::CmdLineCmd* aCmd)
 {
 }
 
 //******************************************************************************
-//******************************************************************************
+
+void CmdLineExec::executeShow(Ris::CmdLineCmd* aCmd)
+{
+   LFIntQueue::show();
+}
+
 //******************************************************************************
 
-void CmdLineExec::executeGo5(Ris::CmdLineCmd* aCmd)
+void CmdLineExec::executeWriteInt(Ris::CmdLineCmd* aCmd)
 {
+   if (LFIntQueue::tryWrite(++mCount))
+   {
+      Prn::print(0, "WRITE PASS  $$ %d", mCount);
+   }
+   else
+   {
+      Prn::print(0, "WRITE FAIL");
+   }
+}
+
+//******************************************************************************
+
+void CmdLineExec::executeReadInt(Ris::CmdLineCmd* aCmd)
+{
+   int tCount=0;
+   if (LFIntQueue::tryRead(&tCount))
+   {
+      Prn::print(0, "READ            PASS  $$ %d", tCount);
+   }
+   else
+   {
+      Prn::print(0, "READ            FAIL");
+   }
 }
 
