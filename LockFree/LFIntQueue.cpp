@@ -3,7 +3,6 @@
 #include <atomic>
 
 #include "LFIndex.h"
-#include "LFBackoff.h"
 #include "LFIntQueue.h"
 
 using namespace std;
