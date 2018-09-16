@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="cc_functions.cpp" />
+    <ClCompile Include="cc_throw.cpp" />
+    <ClCompile Include="ccBlockBoxArray.cpp" />
+    <ClCompile Include="ccBlockPoolCentral.cpp" />
+    <ClCompile Include="ccBlockPoolLFFreeList.cpp" />
+    <ClCompile Include="ccBlockPoolLMFreeList.cpp" />
+    <ClCompile Include="ccBlockPoolLMIndexStack.cpp" />
+    <ClCompile Include="ccBlockPoolParms.cpp" />
+    <ClCompile Include="ccLFObjectQueue.cpp" />
+    <ClCompile Include="ccLMObjectQueue.cpp" />
+    <ClCompile Include="ccSynchLock_linux.cpp" />
+    <ClCompile Include="ccTreeNode.cpp" />
+    <ClCompile Include="ccTreeNodeDestroyer.cpp" />
+    <ClCompile Include="ccTreeNodeVisitor.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cc_functions.h" />
+    <ClInclude Include="cc_throw.h" />
+    <ClInclude Include="ccBlockBoxArray.h" />
+    <ClInclude Include="ccBlockHeader.h" />
+    <ClInclude Include="ccBlockPool.h" />
+    <ClInclude Include="ccBlockPoolBase.h" />
+    <ClInclude Include="ccBlockPoolBaseIndexStack.h" />
+    <ClInclude Include="ccBlockPoolBlock.h" />
+    <ClInclude Include="ccBlockPoolCentral.h" />
+    <ClInclude Include="ccBlockPoolIndex.h" />
+    <ClInclude Include="ccBlockPoolLFFreeList.h" />
+    <ClInclude Include="ccBlockPoolLMFreeList.h" />
+    <ClInclude Include="ccBlockPoolLMIndexStack.h" />
+    <ClInclude Include="ccBlockPoolParms.h" />
+    <ClInclude Include="ccCallPointer.h" />
+    <ClInclude Include="ccContainers.h" />
+    <ClInclude Include="ccContainers2.h" />
+    <ClInclude Include="ccDefs.h" />
+    <ClInclude Include="ccDiagrams.h" />
+    <ClInclude Include="ccLFIndex.h" />
+    <ClInclude Include="ccLFObjectQueue.h" />
+    <ClInclude Include="ccLFPointerQueue.h" />
+    <ClInclude Include="ccLFValueQueue.h" />
+    <ClInclude Include="ccLMObjectQueue.h" />
+    <ClInclude Include="ccLMValueQueue.h" />
+    <ClInclude Include="ccMemoryPtr.h" />
+    <ClInclude Include="ccRecursiveAnchor.h" />
+    <ClInclude Include="ccSRSWValueQueue.h" />
+    <ClInclude Include="ccSynchLock.h" />
+    <ClInclude Include="ccTreeNode.h" />
+    <ClInclude Include="ccTreeNodeDestroyer.h" />
+    <ClInclude Include="ccTreeNodeVisitor.h" />
+    <ClInclude Include="ccValueHistory.h" />
+    <ClInclude Include="ccValueQueue.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+</Project>
