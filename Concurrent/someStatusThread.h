@@ -1,58 +1,57 @@
 #pragma once
 
 /*==============================================================================
-
-Lock Free Pointer Queue Class Template. 
-
-This implements a pointer queue. It uses the lock free value queue template
-and provides some methods that simplify usage.
-
 ==============================================================================*/
 
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
+#include "risThreadsThreads.h"
 
-#include "ccLFValueQueue.h"
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-
-namespace CC
+namespace Some
 {
 
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
 
-template <class Element>
-class LFPointerQueue : public CC::LFValueQueue <Element>
+class StatusThread : public Ris::Threads::BaseThread
 {
 public:
-
-   typedef CC::LFValueQueue <Element> BaseClass;
+   typedef Ris::Threads::BaseThread BaseClass;
 
    //******************************************************************************
    //******************************************************************************
    //******************************************************************************
-   // These simplify queue access.
+   // Members.
 
-   bool writePtr (Element aValue)
-   {
-      return BaseClass::tryWrite(aValue);
-   }
+   // Thread termination flag.
+   bool  mTerminateFlag;
 
-   Element readPtr ()
-   {
-      void* tValue;
-      if (!BaseClass::tryRead(&tValue)) return 0;
-      return tValue;
-   }
+   // Program process string.
+   char mProcString[20];
+
+   //******************************************************************************
+   //******************************************************************************
+   //******************************************************************************
+   // Methods.
+
+   // Constructor.
+   StatusThread(); 
+
+   // Base class overloads.
+   void threadInitFunction();
+   void threadRunFunction();
+   void threadExitFunction();
+   void shutdownThread();
+
+   // Update the program process string.
+   void updateProcString();
 };
 
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
 }//namespace
+
 

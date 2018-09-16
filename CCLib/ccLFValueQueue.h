@@ -133,7 +133,7 @@ public:
       int mMemorySize;
 
       // Calculate and store memory sizes.
-      MemorySize::MemorySize(int aNumElements)
+      MemorySize(int aNumElements)
       {
          mStateSize         = LFValueQueueState::getMemorySize();
          mQueueArraySize    = cc_round_upto16(cNewArrayExtraMemory + (aNumElements + 1)*sizeof(AtomicLFIndex));
