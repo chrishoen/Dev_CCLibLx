@@ -68,13 +68,13 @@ void StatusThread::threadRunFunction()
             case 1:  tQueueSize = LFIntQueue::size(); break;
             case 2:  tQueueSize = gShare.mLFPointerQueue.size(); break;
             case 3:  tQueueSize = gShare.mLFObjectQueue.size(); break;
-            case 4:  tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockA); break;
+            case 4:  tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockX); break;
             case 5:  tQueueSize = gShare.mLFIntQueue.size(); break;
             case 6:  tQueueSize = gShare.mSRSWIntQueue.size(); break;
             case 7:  tQueueSize = gShare.mLMObjectQueue.size(); break;
             case 8:  tQueueSize = gShare.mLMIntQueue.size(); break;
-            case 9:  tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockA); break;
-            case 10: tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockA); break;
+            case 9:  tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockX); break;
+            case 10: tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockX); break;
             }
 
             Prn::print(Prn::ThreadRun1, "%s$   %s   %s %8d",
@@ -92,15 +92,15 @@ void StatusThread::threadRunFunction()
             case 1:  tQueueSize = LFIntQueue::size();
             case 2:  tQueueSize = gShare.mLFPointerQueue.size();
             case 3:  tQueueSize = gShare.mLFObjectQueue.size();
-            case 4:  tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockA);
+            case 4:  tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockX);
             case 5:  tQueueSize = gShare.mLFIntQueue.size();
             case 6:  tQueueSize = gShare.mSRSWIntQueue.size();
             case 7:  tQueueSize = gShare.mLMObjectQueue.size();
             case 8:  tQueueSize = gShare.mLMIntQueue.size(); break;
             case 11: tQueueSize = 9911;
-            case 12: tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockA);
+            case 12: tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockX);
             case 21: tQueueSize = 9921;
-            case 22: tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockA);
+            case 22: tQueueSize = CC::getBlockPoolSize(cBlockPoolIndex_MyBlockX);
             }
 
             Prn::print(Prn::ThreadRun1, "%s$   %s   %s %8d",

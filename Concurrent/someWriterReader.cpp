@@ -13,7 +13,7 @@ Description:
 #include "LFBackoff.h"
 #include "LFFreeList.h"
 #include "LFIntQueue.h"
-#include "someMyBlockA.h"
+#include "someMyBlockX.h"
 #include "someClass1.h"
 #include "someShare.h"
 #include "someWriterReader.h"
@@ -160,7 +160,7 @@ void WriterReader::startTrialType4()
       {
          ++mCount &= 0xFFFF;
 
-         MyBlockA* tObject = new MyBlockA();
+         MyBlockX* tObject = new MyBlockX();
          tObject->mCode1 = mCount;
          gShare.mLFValueQueue.tryWrite(tObject);
 
@@ -284,7 +284,7 @@ void WriterReader::startTrialType22()
       {
          ++mCount &= 0xFFFF;
 
-         MyBlockA* tObject = new MyBlockA();
+         MyBlockX* tObject = new MyBlockX();
          tObject->mCode1 = mCount;
          gShare.mLFValueQueue.tryWrite(tObject);
 
@@ -547,11 +547,11 @@ void WriterReader::writereadType4(int aNumWrites)
       {
          ++mCount &= 0xFFFF;
 
-         MyBlockA* tObject = 0;
+         MyBlockX* tObject = 0;
          bool tPass = false;
 
          mMarkerWrite.doStart();
-         tObject = new MyBlockA();
+         tObject = new MyBlockX();
          mMarkerWrite.doStop();
 
          if (tObject)
@@ -580,7 +580,7 @@ void WriterReader::writereadType4(int aNumWrites)
          bool tPass;
          int tCount;
 
-         MyBlockA* tObject = 0;
+         MyBlockX* tObject = 0;
          tPass = gShare.mLFValueQueue.tryRead((void**)&tObject);
          tDelayA.delay();
 
@@ -775,10 +775,10 @@ void WriterReader::writereadType12(int aNumWrites)
 
    for (int i = 0; i < aNumWrites; i++)
    {
-      MyBlockA* tObject=0;
+      MyBlockX* tObject=0;
 
       mMarkerWrite.doStart();
-      tObject = new MyBlockA;
+      tObject = new MyBlockX;
       mMarkerWrite.doStop();
       tDelayA.delay();
 
@@ -887,11 +887,11 @@ void WriterReader::writereadType22(int aNumWrites)
       {
          ++mCount &= 0xFFFF;
 
-         MyBlockA* tObject = 0;
+         MyBlockX* tObject = 0;
          bool tPass = false;
 
          mMarkerWrite.doStart();
-         tObject = new MyBlockA();
+         tObject = new MyBlockX();
          mMarkerWrite.doStop();
 
          if (tObject)
@@ -920,7 +920,7 @@ void WriterReader::writereadType22(int aNumWrites)
          bool tPass;
          int tCount;
 
-         MyBlockA* tObject = 0;
+         MyBlockX* tObject = 0;
          tPass = gShare.mLFValueQueue.tryRead((void**)&tObject);
          tDelayA.delay();
 
@@ -1038,7 +1038,7 @@ void WriterReader::flushType4()
    {
       int tCount;
       bool tPass;
-      MyBlockA* tObject = 0;
+      MyBlockX* tObject = 0;
       tPass = gShare.mLFValueQueue.tryRead((void**)&tObject);
       if (!tPass) break;
       tCount = tObject->mCode1;
@@ -1132,7 +1132,7 @@ void WriterReader::flushType22()
    {
       int tCount;
       bool tPass;
-      MyBlockA* tObject = 0;
+      MyBlockX* tObject = 0;
       tPass = gShare.mLFValueQueue.tryRead((void**)&tObject);
       if (!tPass) break;
       tCount = tObject->mCode1;

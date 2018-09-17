@@ -44,7 +44,7 @@
     <ClCompile Include="Parms.cpp" />
     <ClCompile Include="someClass1.cpp" />
     <ClCompile Include="someMessage.cpp" />
-    <ClCompile Include="someMyBlockA.cpp" />
+    <ClCompile Include="someMyBlockX.cpp" />
     <ClCompile Include="someReader.cpp" />
     <ClCompile Include="someReaderThread.cpp" />
     <ClCompile Include="someShare.cpp" />
@@ -71,7 +71,7 @@
     <ClInclude Include="someBlockPoolIndex.h" />
     <ClInclude Include="someClass1.h" />
     <ClInclude Include="someMessage.h" />
-    <ClInclude Include="someMyBlockA.h" />
+    <ClInclude Include="someMyBlockX.h" />
     <ClInclude Include="someReader.h" />
     <ClInclude Include="someReaderThread.h" />
     <ClInclude Include="someShare.h" />

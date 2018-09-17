@@ -7,7 +7,6 @@
 //******************************************************************************
 //******************************************************************************
 #include "ccBlockPool.h"
-
 namespace Some
 {
 
@@ -15,7 +14,7 @@ namespace Some
 //******************************************************************************
 //******************************************************************************
 
-class MyBlockA
+class MyBlockX : public CC::HasBlockHandle
 {
 public:
 
@@ -24,6 +23,7 @@ public:
    //***************************************************************************
    // Members.
 
+   // Codes.
    int  mIdentifier;
    int  mCode1;
    int  mCode2;
@@ -33,24 +33,25 @@ public:
    //***************************************************************************
    //***************************************************************************
    //***************************************************************************
-   // Intrastructure.
+   // Methods.
 
-   // Allocate or deallocate a block from the block pool.
-   static void* operator new      (size_t sz);
-   static void  operator delete   (void* ptr);
+   // Allocate a block from the block pool and call the constructor.
+   static MyBlockX* create();
+   static MyBlockX* create(int aIdentifier);
+   // Deallocate a block from the block pool.
+   static void  operator delete(void* ptr);
 
    // Constructors.
-   MyBlockA();
-   MyBlockA(int aIdentifier);
-
+   MyBlockX();
+   MyBlockX(int aIdentifier);
    // Destructor.
-  ~MyBlockA();
+  ~MyBlockX();
 
   //***************************************************************************
   //***************************************************************************
   //***************************************************************************
   // Methods.
-
+  
    void method1();
 };
 
@@ -58,3 +59,5 @@ public:
 //******************************************************************************
 //******************************************************************************
 }//namespace
+
+

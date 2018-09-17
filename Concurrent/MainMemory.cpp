@@ -3,7 +3,7 @@
 #include "Parms.h"
 #include "ccBlockPool.h"
 #include "someBlockPoolIndex.h"
-#include "someMyBlockA.h"
+#include "someMyBlockX.h"
 
 //******************************************************************************
 //******************************************************************************
@@ -25,11 +25,11 @@ void main_memory_initialize()
 
    // Create block pool.
    tBlockPoolParms.reset();
-   tBlockPoolParms.mPoolIndex     = Some::cBlockPoolIndex_MyBlockA;
+   tBlockPoolParms.mPoolIndex     = Some::cBlockPoolIndex_MyBlockX;
 // tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LFFreeList;
    tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LMFreeList;
    tBlockPoolParms.mNumBlocks     = gParms.mNumElements;
-   tBlockPoolParms.mBlockSize     = sizeof(Some::MyBlockA);
+   tBlockPoolParms.mBlockSize     = sizeof(Some::MyBlockX);
    tBlockPoolParms.mNoThrowFlag   = true;
    CC::createBlockPool(&tBlockPoolParms);
 }

@@ -10,7 +10,6 @@
     <ClCompile Include="Parms.cpp" />
     <ClCompile Include="someClass1.cpp" />
     <ClCompile Include="someMessage.cpp" />
-    <ClCompile Include="someMyBlockA.cpp" />
     <ClCompile Include="someReader.cpp" />
     <ClCompile Include="someReaderThread.cpp" />
     <ClCompile Include="someShare.cpp" />
@@ -24,6 +23,7 @@
     <ClCompile Include="someWriterThread.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Timing.cpp" />
+    <ClCompile Include="someMyBlockX.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CmdLineExec.h" />
@@ -37,7 +37,6 @@
     <ClInclude Include="someBlockPoolIndex.h" />
     <ClInclude Include="someClass1.h" />
     <ClInclude Include="someMessage.h" />
-    <ClInclude Include="someMyBlockA.h" />
     <ClInclude Include="someReader.h" />
     <ClInclude Include="someReaderThread.h" />
     <ClInclude Include="someShare.h" />
@@ -51,5 +50,6 @@
     <ClInclude Include="someWriterThread.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Timing.h" />
+    <ClInclude Include="someMyBlockX.h" />
   </ItemGroup>
 </Project>

@@ -12,7 +12,7 @@ Description:
 #include "LFBackoff.h"
 #include "LFFreeList.h"
 #include "LFIntQueue.h"
-#include "someMyBlockA.h"
+#include "someMyBlockX.h"
 #include "someShare.h"
 #include "someWriter.h"
 
@@ -176,12 +176,12 @@ void Writer::writeType4(int aNumWrites)
 
    for (int i = 0; i < aNumWrites; i++)
    {
-      MyBlockA* tObject = 0;
+      MyBlockX* tObject = 0;
       bool tPass = false;
       int tCount = mCount & 0xFFFF;
 
       mMarkerWrite.doStart();
-      tObject = new MyBlockA();
+      tObject = new MyBlockX();
       mMarkerWrite.doStop();
 
       if (tObject)
@@ -366,12 +366,12 @@ void Writer::writeType9(int aNumWrites)
 
    for (int i = 0; i < aNumWrites; i++)
    {
-      MyBlockA* tObject = 0;
+      MyBlockX* tObject = 0;
       bool tPass = false;
       int tCount = mCount & 0xFFFF;
 
       mMarkerWrite.doStart();
-      tObject = new MyBlockA();
+      tObject = MyBlockX::create();
       mMarkerWrite.doStop();
 
       if (tObject)
