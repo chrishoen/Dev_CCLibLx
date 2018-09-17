@@ -29,8 +29,9 @@ void main_memory_initialize()
    tBlockPoolParms.reset();
    tBlockPoolParms.mPoolIndex     = Some::cBlockPoolIndex_MyBlockA;
    tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LMFreeList;
-   tBlockPoolParms.mNumBlocks     = 1000;
-   tBlockPoolParms.mBlockSize     = sizeof(Some::MyBlockA);
+   tBlockPoolParms.mNumBlocks     = 3;
+   tBlockPoolParms.mBlockSize = sizeof(Some::MyBlockA);
+   tBlockPoolParms.mNoThrowFlag = true;
    CC::createBlockPool(&tBlockPoolParms);
 
    // Create block pool.

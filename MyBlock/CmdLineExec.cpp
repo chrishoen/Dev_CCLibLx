@@ -125,6 +125,26 @@ void CmdLineExec::executeGoA3(Ris::CmdLineCmd* aCmd)
 
 void CmdLineExec::executeGoA4(Ris::CmdLineCmd* aCmd)
 {
+   Prn::print(0, "GoA4 ******************* %d", sizeof(Some::MyBlockA));
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
+
+   Some::MyBlockA* tX1 = new Some::MyBlockA(101);
+   Some::MyBlockA* tX2 = new Some::MyBlockA(102);
+   Some::MyBlockA* tX3 = new Some::MyBlockA(103);
+   Some::MyBlockA* tX4 = new Some::MyBlockA(104);
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
+   if (tX1) tX1->method1();
+   if (tX2) tX2->method1();
+   if (tX3) tX3->method1();
+   if (tX4) tX4->method1();
+
+   if (tX1) delete tX1;
+   if (tX2) delete tX2;
+   if (tX3) delete tX3;
+   if (tX4) delete tX4;
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
 }
 
 //******************************************************************************
