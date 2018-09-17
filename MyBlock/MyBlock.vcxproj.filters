@@ -9,6 +9,7 @@
     <ClCompile Include="someMyBlockB.cpp" />
     <ClCompile Include="someMyBlockR.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="someMyBlockC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CmdLineExec.h" />
@@ -19,5 +20,6 @@
     <ClInclude Include="someMyBlockB.h" />
     <ClInclude Include="someMyBlockR.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="someMyBlockC.h" />
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@
 #include "someBlockPoolIndex.h"
 #include "someMyBlockA.h"
 #include "someMyBlockB.h"
+#include "someMyBlockC.h"
 #include "someMyBlockR.h"
 
 #include "CmdLineExec.h"
@@ -11,14 +12,19 @@
 using namespace std;
 
 //******************************************************************************
+//******************************************************************************
+//******************************************************************************
 CmdLineExec::CmdLineExec()
 {
 }
-//******************************************************************************
 void CmdLineExec::reset()
 {
 }
+
 //******************************************************************************
+//******************************************************************************
+//******************************************************************************
+
 void CmdLineExec::execute(Ris::CmdLineCmd* aCmd)
 {
    if(aCmd->isCmd("RESET"  ))  reset();
@@ -31,6 +37,9 @@ void CmdLineExec::execute(Ris::CmdLineCmd* aCmd)
 
    if(aCmd->isCmd("B1"     ))  executeGoB1(aCmd);
    if(aCmd->isCmd("B2"     ))  executeGoB2(aCmd);
+
+   if(aCmd->isCmd("C1"     ))  executeGoC1(aCmd);
+   if(aCmd->isCmd("C2"     ))  executeGoC2(aCmd);
 
    if(aCmd->isCmd("R1"     ))  executeGoR1(aCmd);
    if(aCmd->isCmd("R2"     ))  executeGoR2(aCmd);
@@ -57,9 +66,10 @@ void CmdLineExec::execute(Ris::CmdLineCmd* aCmd)
 
 void CmdLineExec::executeGoA1(Ris::CmdLineCmd* aCmd)
 {
+   Prn::print(0, "GoA1 ******************* %d", sizeof(Some::MyBlockA));
+
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
 
-   Prn::print(0, "GoA1 %d", sizeof(Some::MyBlockA));
    Some::MyBlockA* tX1 = new Some::MyBlockA(101);
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
    tX1->method1();
@@ -75,6 +85,8 @@ void CmdLineExec::executeGoA1(Ris::CmdLineCmd* aCmd)
 
 void CmdLineExec::executeGoA2(Ris::CmdLineCmd* aCmd)
 {
+   Prn::print(0, "GoA2 ******************* %d", sizeof(Some::MyBlockA));
+
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
 
    Some::MyBlockA* tX1 = new Some::MyBlockA(101);
@@ -94,6 +106,8 @@ void CmdLineExec::executeGoA2(Ris::CmdLineCmd* aCmd)
 
 void CmdLineExec::executeGoA3(Ris::CmdLineCmd* aCmd)
 {
+   Prn::print(0, "GoA3 ******************* %d", sizeof(Some::MyBlockA));
+
    Some::MyBlockA* tX1 = new Some::MyBlockA(101);
    Prn::print(0, "%d %d",tX1->mBlockHandle.mPoolIndex,tX1->mBlockHandle.mBlockIndex);
 
@@ -118,6 +132,8 @@ void CmdLineExec::executeGoA4(Ris::CmdLineCmd* aCmd)
 
 void CmdLineExec::executeGoT1(Ris::CmdLineCmd* aCmd)
 {
+   Prn::print(0, "GoT1 ******************* %d", sizeof(Some::MyBlockA));
+
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
 
    Some::MyBlockA* tX1 = new Some::MyBlockA(101);
@@ -133,6 +149,8 @@ void CmdLineExec::executeGoT1(Ris::CmdLineCmd* aCmd)
 
 void CmdLineExec::executeGoB1(Ris::CmdLineCmd* aCmd)
 {
+   Prn::print(0, "GoB1 ******************* %d", sizeof(Some::MyBlockB));
+
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockB);
 
    Some::MyBlockB* t1B1 = new Some::MyBlockB;
@@ -150,6 +168,7 @@ void CmdLineExec::executeGoB1(Ris::CmdLineCmd* aCmd)
 
 void CmdLineExec::executeGoB2(Ris::CmdLineCmd* aCmd)
 {
+   Prn::print(0, "GoB2 ******************* %d", sizeof(Some::MyBlockB));
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockB);
 
    Some::MyBlockB* t1B1 = new Some::MyBlockB;
@@ -161,6 +180,46 @@ void CmdLineExec::executeGoB2(Ris::CmdLineCmd* aCmd)
    delete t1B2;
 
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockB);
+}
+
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
+
+void CmdLineExec::executeGoC1(Ris::CmdLineCmd* aCmd)
+{
+   Prn::print(0, "GoC1 ******************* %d", sizeof(Some::MyBlockC));
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
+
+   Some::MyBlockC* t1C1 = new Some::MyBlockC;
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
+
+   delete t1C1;
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
+}
+
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
+
+void CmdLineExec::executeGoC2(Ris::CmdLineCmd* aCmd)
+{
+   Prn::print(0, "GoC2 ******************* %d", sizeof(Some::MyBlockC));
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
+
+   Some::MyBlockC* t1C1 = new Some::MyBlockC;
+   Some::MyBlockC* t1C2 = new Some::MyBlockC;
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
+
+   delete t1C1;
+   delete t1C2;
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
 }
 
 //******************************************************************************

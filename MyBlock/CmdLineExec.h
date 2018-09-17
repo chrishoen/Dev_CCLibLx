@@ -24,6 +24,9 @@ public:
   void executeGoB1(Ris::CmdLineCmd* aCmd);
   void executeGoB2(Ris::CmdLineCmd* aCmd);
 
+  void executeGoC1(Ris::CmdLineCmd* aCmd);
+  void executeGoC2(Ris::CmdLineCmd* aCmd);
+
   void executeGoR1(Ris::CmdLineCmd* aCmd);
   void executeGoR2(Ris::CmdLineCmd* aCmd);
 

@@ -46,6 +46,7 @@
     <ClCompile Include="MainMemory.cpp" />
     <ClCompile Include="someMyBlockA.cpp" />
     <ClCompile Include="someMyBlockB.cpp" />
+    <ClCompile Include="someMyBlockC.cpp" />
     <ClCompile Include="someMyBlockR.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
@@ -56,6 +57,7 @@
     <ClInclude Include="someBlockPoolIndex.h" />
     <ClInclude Include="someMyBlockA.h" />
     <ClInclude Include="someMyBlockB.h" />
+    <ClInclude Include="someMyBlockC.h" />
     <ClInclude Include="someMyBlockR.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
