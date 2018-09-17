@@ -70,7 +70,7 @@ void CmdLineExec::executeGoA1(Ris::CmdLineCmd* aCmd)
 
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
 
-   Some::MyBlockA* tX1 = new Some::MyBlockA(101);
+   Some::MyBlockA* tX1 = Some::MyBlockA::create(101);
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
    tX1->method1();
 
@@ -89,8 +89,8 @@ void CmdLineExec::executeGoA2(Ris::CmdLineCmd* aCmd)
 
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
 
-   Some::MyBlockA* tX1 = new Some::MyBlockA(101);
-   Some::MyBlockA* tX2 = new Some::MyBlockA(102);
+   Some::MyBlockA* tX1 = Some::MyBlockA::create(101);
+   Some::MyBlockA* tX2 = Some::MyBlockA::create(102);
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
    tX1->method1();
    tX2->method1();
@@ -109,14 +109,17 @@ void CmdLineExec::executeGoA3(Ris::CmdLineCmd* aCmd)
 {
    Prn::print(0, "GoA3 ******************* %d", sizeof(Some::MyBlockA));
 
-   Some::MyBlockA* tX1 = new Some::MyBlockA(101);
-   Prn::print(0, "%d %d",tX1->mBlockHandle.mPoolIndex,tX1->mBlockHandle.mBlockIndex);
+   Some::MyBlockA* tX1 = Some::MyBlockA::create(101);
+   Prn::print(0, "%d %d", tX1->mBlockHandle.mPoolIndex, tX1->mBlockHandle.mBlockIndex);
 
    CC::BlockHandle tBlockHandle = CC::getBlockPoolBlockHandle(tX1);
    Prn::print(0, "%d %d",tBlockHandle.mPoolIndex,tBlockHandle.mBlockIndex);
 
-   Some::MyBlockA* tX2 = new Some::MyBlockA(102);
+   Some::MyBlockA* tX2 = Some::MyBlockA::create(101);
    Prn::print(0, "%d %d",tX2->mBlockHandle.mPoolIndex,tX2->mBlockHandle.mBlockIndex);
+
+   delete tX1;
+   delete tX2;
 }
 
 //******************************************************************************
@@ -129,10 +132,10 @@ void CmdLineExec::executeGoA4(Ris::CmdLineCmd* aCmd)
 
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
 
-   Some::MyBlockA* tX1 = new Some::MyBlockA(101);
-   Some::MyBlockA* tX2 = new Some::MyBlockA(102);
-   Some::MyBlockA* tX3 = new Some::MyBlockA(103);
-   Some::MyBlockA* tX4 = new Some::MyBlockA(104);
+   Some::MyBlockA* tX1 = Some::MyBlockA::create(101);
+   Some::MyBlockA* tX2 = Some::MyBlockA::create(102);
+   Some::MyBlockA* tX3 = Some::MyBlockA::create(103);
+   Some::MyBlockA* tX4 = Some::MyBlockA::create(104);
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
    if (tX1) tX1->method1();
    if (tX2) tX2->method1();

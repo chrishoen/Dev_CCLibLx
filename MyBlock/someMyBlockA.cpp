@@ -19,12 +19,13 @@ namespace Some
 //******************************************************************************
 //******************************************************************************
 // Allocate a block from the block pool at the given block pool index.
+// Call the constructor with placement new.
 // Return a pointer to the allocated block.
 // Return null if the block pool is empty.
 
-void* MyBlockA::operator new(size_t sz)
+MyBlockA* MyBlockA::create()
 {
-   Prn::print(0, "MyBlockA::new   %d",(int)sz);
+   Prn::print(0, "MyBlockA::create");
 
    // Block pointer.
    void* tBlockPointer = 0;
@@ -32,11 +33,44 @@ void* MyBlockA::operator new(size_t sz)
    // Try to allocate a block from the block pool.
    CC::allocateBlockPoolBlock(Some::cBlockPoolIndex_MyBlockA, (void**)&tBlockPointer, 0);
 
+   // Guard.
+   if (tBlockPointer == 0) return 0;
+
+   // Call the constructor with placement new.
+   MyBlockA* tPtr = new (tBlockPointer)  MyBlockA;
+
    // Return the pointer to the allocated block.
-   // Return null if the block pool is empty.
-   return tBlockPointer;
+   return tPtr;
 }
-  
+
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
+// Allocate a block from the block pool at the given block pool index.
+// Call the constructor with placement new.
+// Return a pointer to the allocated block.
+// Return null if the block pool is empty.
+
+MyBlockA* MyBlockA::create(int aIdentifier)
+{
+   Prn::print(0, "MyBlockA::create");
+
+   // Block pointer.
+   void* tBlockPointer = 0;
+
+   // Try to allocate a block from the block pool.
+   CC::allocateBlockPoolBlock(Some::cBlockPoolIndex_MyBlockA, (void**)&tBlockPointer, 0);
+
+   // Guard.
+   if (tBlockPointer == 0) return 0;
+
+   // Call the constructor with placement new.
+   MyBlockA* tPtr = new (tBlockPointer)  MyBlockA(aIdentifier);
+
+   // Return the pointer to the allocated block.
+   return tPtr;
+}
+
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
@@ -58,7 +92,7 @@ MyBlockA::MyBlockA()
 {
    Prn::print(0, "MyBlockA::constructor");
 
-   mIdentifier = 0;
+   mIdentifier = 99;
    mCode1=101;
    mCode2=102;
    mCode3=103;
@@ -91,7 +125,7 @@ MyBlockA::MyBlockA(int aIdentifier)
 
 MyBlockA::~MyBlockA()
 {
-   Prn::print(0, "MyBlockA::destuctor   %d",mIdentifier);
+   Prn::print(0, "MyBlockA::destructor  %d",mIdentifier);
 }
 
 //****************************************************************************
