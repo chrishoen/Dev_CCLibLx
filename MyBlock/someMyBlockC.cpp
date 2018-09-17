@@ -24,7 +24,7 @@ namespace Some
 
 void* MyBlockC::operator new(size_t sz)
 {
-   Prn::print(0, "MyBlockC::new   %d", (int)sz);
+   Prn::print(0, "MyBlockC::new   %d",(int)sz);
 
    // Block pointer.
    void* tBlockPointer = 0;
@@ -63,6 +63,8 @@ MyBlockC::MyBlockC()
    mCode2=102;
    mCode3=103;
    mCode4=104;
+
+// mBlockHandle.set(this);
 }
 
 //****************************************************************************
@@ -72,13 +74,15 @@ MyBlockC::MyBlockC()
 
 MyBlockC::MyBlockC(int aIdentifier)
 {
-   Prn::print(0, "MyBlockC::constructor %d", aIdentifier);
+   Prn::print(0, "MyBlockC::constructor %d",aIdentifier);
 
    mIdentifier = aIdentifier;
    mCode1=101;
    mCode2=102;
    mCode3=103;
    mCode4=104;
+
+// mBlockHandle.set(this);
 }
 
 //****************************************************************************
@@ -87,7 +91,7 @@ MyBlockC::MyBlockC(int aIdentifier)
 
 MyBlockC::~MyBlockC()
 {
-   Prn::print(0, "MyBlockA::destuctor   %d", mIdentifier);
+   Prn::print(0, "MyBlockC::destuctor   %d",mIdentifier);
 }
 
 //****************************************************************************
@@ -99,7 +103,4 @@ void MyBlockC::method1()
    Prn::print(0, "MyBlockC::method1     %d",mIdentifier);
 }
 
-//****************************************************************************
-//****************************************************************************
-//****************************************************************************
 }//namespace

@@ -91,8 +91,9 @@ void CmdLineExec::executeGoA2(Ris::CmdLineCmd* aCmd)
 
    Some::MyBlockA* tX1 = new Some::MyBlockA(101);
    Some::MyBlockA* tX2 = new Some::MyBlockA(102);
-
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
+   tX1->method1();
+   tX2->method1();
 
    delete tX1;
    delete tX2;
@@ -192,11 +193,11 @@ void CmdLineExec::executeGoC1(Ris::CmdLineCmd* aCmd)
 
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
 
-   Some::MyBlockC* t1C1 = new Some::MyBlockC;
-
+   Some::MyBlockC* tX1 = new Some::MyBlockC(101);
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
+   tX1->method1();
 
-   delete t1C1;
+   delete tX1;
 
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
 }
@@ -211,13 +212,14 @@ void CmdLineExec::executeGoC2(Ris::CmdLineCmd* aCmd)
 
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
 
-   Some::MyBlockC* t1C1 = new Some::MyBlockC;
-   Some::MyBlockC* t1C2 = new Some::MyBlockC;
-
+   Some::MyBlockC* tX1 = new Some::MyBlockC(101);
+   Some::MyBlockC* tX2 = new Some::MyBlockC(102);
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
+   tX1->method1();
+   tX2->method1();
 
-   delete t1C1;
-   delete t1C2;
+   delete tX1;
+   delete tX2;
 
    CC::showBlockPool(Some::cBlockPoolIndex_MyBlockC);
 }
