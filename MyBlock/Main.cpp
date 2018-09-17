@@ -3,6 +3,7 @@
 #include "risCmdLineConsole.h"
 
 #include "MainInit.h"
+#include "MainMemory.h"
 #include "CmdLineExec.h"
 
 //******************************************************************************
@@ -17,6 +18,7 @@ int main(int argc,char** argv)
    // Initialize the program.
 
    main_initialize(argc,argv);
+   main_memory_initialize();
 
    //***************************************************************************
    //***************************************************************************

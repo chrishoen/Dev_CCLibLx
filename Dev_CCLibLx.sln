@@ -12,6 +12,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Concurrent", "Concurrent\Concurrent.vcxproj", "{68A8DF77-6489-45BF-BC33-833C07F67A26}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyBlock", "MyBlock\MyBlock.vcxproj", "{EAF852AE-602C-4487-967C-996E47F85736}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2ECEC11E-B8E9-4A17-A74A-DB1147210FF4} = {2ECEC11E-B8E9-4A17-A74A-DB1147210FF4}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
