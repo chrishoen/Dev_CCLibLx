@@ -37,7 +37,7 @@ BlockPoolParms::BlockPoolParms()
 void BlockPoolParms::reset()
 {
    mPoolIndex        = 0;
-   mBlockPoolType    = cBlockPoolType_FreeList;
+   mBlockPoolType    = cBlockPoolType_LMFreeList;
    mLockFreeFlag     = true;
    mNumBlocks        = 0;
    mBlockSize        = 0;

@@ -105,14 +105,14 @@ void createBlockPool(BlockPoolParms* aParms)
    switch (aParms->mBlockPoolType)
    {
       // Create and initialize the block pool.
-      case cBlockPoolType_FreeList :
+      case cBlockPoolType_LMFreeList :
       {
          mBlockPool[tPoolIndex] = new BlockPoolLMFreeList;
          mBlockPool[tPoolIndex]->initialize(tParms);
       }
       break;
       // Create and initialize the block pool.
-      case cBlockPoolType_Faster :
+      case cBlockPoolType_LFFreeList :
       {
          mBlockPool[tPoolIndex] = new BlockPoolLFFreeList;
          mBlockPool[tPoolIndex]->initialize(tParms);

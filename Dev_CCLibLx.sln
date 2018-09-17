@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CCLib", "CCLib\CCLib.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Concurrent", "Concurrent\Concurrent.vcxproj", "{68A8DF77-6489-45BF-BC33-833C07F67A26}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyBlock", "MyBlock\MyBlock.vcxproj", "{EAF852AE-602C-4487-967C-996E47F85736}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -87,6 +89,22 @@ Global
 		{68A8DF77-6489-45BF-BC33-833C07F67A26}.Release|x64.Build.0 = Release|x64
 		{68A8DF77-6489-45BF-BC33-833C07F67A26}.Release|x86.ActiveCfg = Release|x86
 		{68A8DF77-6489-45BF-BC33-833C07F67A26}.Release|x86.Build.0 = Release|x86
+		{EAF852AE-602C-4487-967C-996E47F85736}.Debug|ARM.ActiveCfg = Debug|ARM
+		{EAF852AE-602C-4487-967C-996E47F85736}.Debug|ARM.Build.0 = Debug|ARM
+		{EAF852AE-602C-4487-967C-996E47F85736}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{EAF852AE-602C-4487-967C-996E47F85736}.Debug|ARM64.Build.0 = Debug|ARM64
+		{EAF852AE-602C-4487-967C-996E47F85736}.Debug|x64.ActiveCfg = Debug|x64
+		{EAF852AE-602C-4487-967C-996E47F85736}.Debug|x64.Build.0 = Debug|x64
+		{EAF852AE-602C-4487-967C-996E47F85736}.Debug|x86.ActiveCfg = Debug|x86
+		{EAF852AE-602C-4487-967C-996E47F85736}.Debug|x86.Build.0 = Debug|x86
+		{EAF852AE-602C-4487-967C-996E47F85736}.Release|ARM.ActiveCfg = Release|ARM
+		{EAF852AE-602C-4487-967C-996E47F85736}.Release|ARM.Build.0 = Release|ARM
+		{EAF852AE-602C-4487-967C-996E47F85736}.Release|ARM64.ActiveCfg = Release|ARM64
+		{EAF852AE-602C-4487-967C-996E47F85736}.Release|ARM64.Build.0 = Release|ARM64
+		{EAF852AE-602C-4487-967C-996E47F85736}.Release|x64.ActiveCfg = Release|x64
+		{EAF852AE-602C-4487-967C-996E47F85736}.Release|x64.Build.0 = Release|x64
+		{EAF852AE-602C-4487-967C-996E47F85736}.Release|x86.ActiveCfg = Release|x86
+		{EAF852AE-602C-4487-967C-996E47F85736}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
