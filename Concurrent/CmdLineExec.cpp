@@ -42,19 +42,20 @@ void CmdLineExec::execute(Ris::CmdLineCmd* aCmd)
 {
    if(aCmd->isCmd("RES"   ))  reset();
 
-   if(aCmd->isCmd("GO1"   ))  executeGo1   (aCmd);
-   if(aCmd->isCmd("W"     ))  executeWrite (aCmd);
-   if(aCmd->isCmd("R"     ))  executeRead  (aCmd);
-   if(aCmd->isCmd("START" ))  executeStart (aCmd);
-   if(aCmd->isCmd("STOP"  ))  executeStop  (aCmd);
-   if(aCmd->isCmd("X"     ))  executeStop  (aCmd);
-   if(aCmd->isCmd("SHOW"  ))  executeShow  (aCmd);
-   if(aCmd->isCmd("T1"    ))  executeTime1 (aCmd);
-   if(aCmd->isCmd("T2"    ))  executeTime2 (aCmd);
-   if(aCmd->isCmd("T8"    ))  executeTime8 (aCmd);
-   if(aCmd->isCmd("D1"    ))  executeDelay1(aCmd);
-   if(aCmd->isCmd("D2"    ))  executeDelay2(aCmd);
-
+   if (aCmd->isCmd("GO1"))   executeGo1(aCmd);
+   if (aCmd->isCmd("W"))     executeWrite(aCmd);
+   if (aCmd->isCmd("R"))     executeRead(aCmd);
+   if (aCmd->isCmd("START")) executeStart(aCmd);
+   if (aCmd->isCmd("STOP"))  executeStop(aCmd);
+   if (aCmd->isCmd("X"))     executeStop(aCmd);
+   if (aCmd->isCmd("SHOW"))  executeShow(aCmd);
+   if (aCmd->isCmd("T1"))    executeTime1(aCmd);
+   if (aCmd->isCmd("T2"))    executeTime2(aCmd);
+   if (aCmd->isCmd("T8"))    executeTime8(aCmd);
+   if (aCmd->isCmd("D1"))    executeDelay1(aCmd);
+   if (aCmd->isCmd("D2"))    executeDelay2(aCmd);
+   if (aCmd->isCmd("A1"))    executeGoA1(aCmd);
+   if (aCmd->isCmd("A2"))    executeGoA2(aCmd);
 
    if(aCmd->isCmd("GO2"   ))  executeGo2   (aCmd);
    if(aCmd->isCmd("GO3"   ))  executeGo3   (aCmd);
@@ -69,6 +70,47 @@ void CmdLineExec::execute(Ris::CmdLineCmd* aCmd)
 
 void CmdLineExec::executeGo1(Ris::CmdLineCmd* aCmd)
 {
+}
+
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
+
+void CmdLineExec::executeGoA1(Ris::CmdLineCmd* aCmd)
+{
+   Prn::print(0, "GoA1 ******************* %d", sizeof(Some::MyBlockA));
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
+
+   Some::MyBlockA* tX1 = new Some::MyBlockA(101);
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
+   tX1->method1();
+
+   delete tX1;
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
+}
+
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
+
+void CmdLineExec::executeGoA2(Ris::CmdLineCmd* aCmd)
+{
+   Prn::print(0, "GoA2 ******************* %d", sizeof(Some::MyBlockA));
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
+
+   Some::MyBlockA* tX1 = new Some::MyBlockA(101);
+   Some::MyBlockA* tX2 = new Some::MyBlockA(102);
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
+   tX1->method1();
+   tX2->method1();
+
+   delete tX1;
+   delete tX2;
+
+   CC::showBlockPool(Some::cBlockPoolIndex_MyBlockA);
 }
 
 //******************************************************************************
