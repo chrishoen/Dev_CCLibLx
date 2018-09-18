@@ -33,6 +33,7 @@ class SynchLock::Specific
 {
 public:
    pthread_rwlock_t mRWLock;
+   pthread_mutex_t mMutex;
 };
 
 //******************************************************************************
@@ -42,8 +43,15 @@ public:
 SynchLock::SynchLock() 
 {
    mSpecific = new Specific;
-   int ret = pthread_rwlock_init(&mSpecific->mRWLock, 0);
+   int ret;
+
+   ret = pthread_mutex_init(&mSpecific->mMutex, NULL);
+   chkerror(ret, "pthread_mutex_init");
+   return;
+
+   ret = pthread_rwlock_init(&mSpecific->mRWLock, 0);
    chkerror(ret, "pthread_rwlock_init");
+   return;
 }
 
 //******************************************************************************
@@ -52,9 +60,18 @@ SynchLock::SynchLock()
 
 SynchLock::~SynchLock() 
 {
-   int ret = pthread_rwlock_destroy(&mSpecific->mRWLock);
+   int ret;
+
+   ret = pthread_mutex_destroy(&mSpecific->mMutex);
+   chkerror(ret, "pthread_mutex_destroy");
+   delete mSpecific;
+   return;
+
+   ret = pthread_rwlock_destroy(&mSpecific->mRWLock);
    chkerror(ret, "pthread_rwlock_destroy");
    delete mSpecific;
+   return;
+
 }
 
 //******************************************************************************
@@ -63,8 +80,15 @@ SynchLock::~SynchLock()
 
 void SynchLock::lock()
 {
-   int ret = pthread_rwlock_wrlock(&mSpecific->mRWLock);
+   int ret;
+
+   ret = pthread_mutex_lock(&mSpecific->mMutex);
+   chkerror(ret, "pthread_mutex_lock");
+   return;
+
+   ret = pthread_rwlock_wrlock(&mSpecific->mRWLock);
    chkerror(ret, "pthread_rwlock_wrlock");
+   return;
 }
 
 //******************************************************************************
@@ -73,8 +97,15 @@ void SynchLock::lock()
 
 void SynchLock::unlock()
 {
-   int ret = pthread_rwlock_unlock(&mSpecific->mRWLock);
+   int ret;
+
+   ret = pthread_mutex_unlock(&mSpecific->mMutex);
+   chkerror(ret, "pthread_mutex_unlock");
+   return;
+
+   ret = pthread_rwlock_unlock(&mSpecific->mRWLock);
    chkerror(ret, "pthread_rwlock_unlock");
+   return;
 }
 
 //******************************************************************************
