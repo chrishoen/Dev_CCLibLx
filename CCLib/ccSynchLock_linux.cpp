@@ -44,12 +44,14 @@ SynchLock::SynchLock()
 {
    mSpecific = new Specific;
    int ret;
+
    ret = pthread_mutex_init(&mSpecific->mMutex, NULL);
    chkerror(ret, "pthread_mutex_init");
    return;
 
    ret = pthread_rwlock_init(&mSpecific->mRWLock, 0);
    chkerror(ret, "pthread_rwlock_init");
+   return;
 }
 
 //******************************************************************************
@@ -59,13 +61,17 @@ SynchLock::SynchLock()
 SynchLock::~SynchLock() 
 {
    int ret;
+
    ret = pthread_mutex_destroy(&mSpecific->mMutex);
    chkerror(ret, "pthread_mutex_destroy");
+   delete mSpecific;
    return;
 
    ret = pthread_rwlock_destroy(&mSpecific->mRWLock);
    chkerror(ret, "pthread_rwlock_destroy");
    delete mSpecific;
+   return;
+
 }
 
 //******************************************************************************
@@ -82,6 +88,7 @@ void SynchLock::lock()
 
    ret = pthread_rwlock_wrlock(&mSpecific->mRWLock);
    chkerror(ret, "pthread_rwlock_wrlock");
+   return;
 }
 
 //******************************************************************************
@@ -98,6 +105,7 @@ void SynchLock::unlock()
 
    ret = pthread_rwlock_unlock(&mSpecific->mRWLock);
    chkerror(ret, "pthread_rwlock_unlock");
+   return;
 }
 
 //******************************************************************************
