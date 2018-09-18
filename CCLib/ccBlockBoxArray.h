@@ -24,10 +24,10 @@ namespace CC
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-// State variables for the object. These are located in a separate class so 
-// that they can be located in external memory.
+// This class encapsulates an array of memory blocks that are dynamically
+// allocated at initialization.
 
-class BlockBoxArrayState
+class BlockBoxArray
 {
 public:
 
@@ -37,7 +37,28 @@ public:
    // This returns the number of bytes that an instance of this class
    // will need to be allocated for it.
 
-   static int getMemorySize();
+   static int getMemorySize(BlockPoolParms* aParms);
+
+   class MemorySize;
+
+   //***************************************************************************
+   //***************************************************************************
+   //***************************************************************************
+   // Members
+
+   // If this flag is false then the memory for this object was created
+   // externally. If it is true then the memory was allocated at 
+   // initialization and must be freed at finalization.
+   bool mOwnMemoryFlag;
+
+   // Pointer to memory for which the stack resides. This is either created
+   // externally and passed as an initialization parameter or it is created
+   // on the system heap at initialization.
+   void* mMemory;
+
+   // Pointer to allocated memory for the block box array.
+   // This is an array of bytes of size NumBlocks*BlockBoxSize.
+   char* mBlockBoxArray;
 
    //***************************************************************************
    //***************************************************************************
@@ -55,38 +76,6 @@ public:
 
    // Memory pool index for the block box array.
    int mPoolIndex;
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Methods.
-
-   // Constructor.
-   BlockBoxArrayState();
-
-   // Initialize.
-   void initialize(BlockPoolParms* aParms);
-};
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// This class encapsulates an array of memory blocks that are dynamically
-// allocated at initialization.
-
-class BlockBoxArray
-{
-public:
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // This returns the number of bytes that an instance of this class
-   // will need to be allocated for it.
-
-   static int getMemorySize(BlockPoolParms* aParms);
-
-   class MemorySize;
 
    //***************************************************************************
    //***************************************************************************
@@ -120,29 +109,6 @@ public:
 
    // Return a pointer to a block body, based on its block index.
    char* getBlockPtr(int aIndex);
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Members
-
-   // If this flag is false then the memory for this object was created
-   // externally. If it is true then the memory was allocated at 
-   // initialization and must be freed at finalization.
-   bool mOwnMemoryFlag;
-
-   // Pointer to memory for which the stack resides. This is either created
-   // externally and passed as an initialization parameter or it is created
-   // on the system heap at initialization.
-   void* mMemory;
-
-   // State variables for the stack. These are located in a separate class
-   // so that they can be located in externale memory.
-   BlockBoxArrayState* mX;
-
-   // Pointer to allocated memory for the block box array.
-   // This is an array of bytes of size NumBlocks*BlockBoxSize.
-   char* mBlockBoxArray;
 
    //***************************************************************************
    //***************************************************************************

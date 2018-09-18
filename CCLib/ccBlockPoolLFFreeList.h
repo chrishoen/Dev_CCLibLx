@@ -45,67 +45,6 @@ namespace CC
 // atomic cas treiber stack. It can also configured to be a normal stack
 // which is not thread safe, but is faster.
 
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// State variables for the object. These are located in a separate class so 
-// that they can be located in external memory.
-
-class BlockPoolLFFreeListState
-{
-public:
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // This returns the number of bytes that an instance of this class
-   // will need to be allocated for it.
-
-   static int getMemorySize();
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Members.
-
-   // Number of blocks allocated.
-   int mNumBlocks;
-
-   // Size of each block allocated.
-   int mBlockSize;
-
-   // Size of each block box allocated.
-   int mBlockBoxSize;
-
-   // Memory pool index for the block box array.
-   int mPoolIndex;
-
-   // Number of free list nodes allocated
-   int mFreeListNumNodes;
-
-   // Free list head node.
-   AtomicLFIndex mFreeListHead;
-
-   // Free list size.
-   std::atomic<int> mFreeListSize;
-   
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Methods.
-
-   // Constructor.
-   BlockPoolLFFreeListState();
-
-   // Initialize.
-   void initialize(BlockPoolParms* aParms);
-};
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// Block pool class.
-
 class BlockPoolLFFreeList : public BlockPoolBase
 {
 public:
@@ -145,10 +84,6 @@ public:
    // on the system heap at initialization.
    void* mMemory;
 
-   // State variables for the block pool. These are located in a separate
-   // class so that they can be located in external memory.
-   BlockPoolLFFreeListState* mX;
-
    // This allocates storage for the blocks on the system heap or in shared
    // memory and provides pointer access to the allocated blocks. This is a block
    // box array. A block box contains a block header and a block body. The
@@ -175,6 +110,32 @@ public:
    // for these must be maintained my the owner throughout the lifetime of
    // the block pool.
    BlockPoolParms* mParms;
+
+   //***************************************************************************
+   //***************************************************************************
+   //***************************************************************************
+   // Members.
+
+   // Number of blocks allocated.
+   int mNumBlocks;
+
+   // Size of each block allocated.
+   int mBlockSize;
+
+   // Size of each block box allocated.
+   int mBlockBoxSize;
+
+   // Memory pool index for the block box array.
+   int mPoolIndex;
+
+   // Number of free list nodes allocated
+   int mFreeListNumNodes;
+
+   // Free list head node.
+   AtomicLFIndex mFreeListHead;
+
+   // Free list size.
+   std::atomic<int> mFreeListSize;
 
    //***************************************************************************
    //***************************************************************************

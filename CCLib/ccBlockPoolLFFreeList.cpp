@@ -21,56 +21,12 @@ namespace CC
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// Constructor
-
-int BlockPoolLFFreeListState::getMemorySize()
-{
-   return cc_round_upto16(sizeof(BlockPoolLFFreeListState));
-}
-
-BlockPoolLFFreeListState::BlockPoolLFFreeListState()
-{
-   // All null.
-   mNumBlocks=0;
-   mBlockSize=0;
-   mBlockBoxSize=0;
-   mPoolIndex=0;
-   mFreeListNumNodes = 0;
-   mFreeListSize = 0;
-}
-
-void BlockPoolLFFreeListState::initialize(BlockPoolParms* aParms)
-{
-   // Do not initialize, if already initialized.
-   if (!aParms->mConstructorFlag) return;
-
-   // Store members.
-   mNumBlocks    = aParms->mNumBlocks;
-   mBlockSize    = cc_round_upto16(aParms->mBlockSize);
-   mBlockBoxSize = cBlockHeaderSize + mBlockSize;
-   mPoolIndex    = aParms->mPoolIndex;
-
-   // Allocate for one extra dummy node.
-   mFreeListNumNodes = aParms->mNumBlocks + 1;
-   mFreeListSize = 0;
-}
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
 // This local class calculates and stores the memory sizes needed by the class.
 
 class BlockPoolLFFreeList::MemorySize
 {
 public:
    // Members.
-   int mStateSize;
    int mBlockSize;
    int mBlockBoxSize;
    int mBlockBoxArraySize;
@@ -80,13 +36,12 @@ public:
    // Calculate and store memory sizes.
    MemorySize(BlockPoolParms* aParms)
    {
-      mStateSize         = BlockPoolLFFreeListState::getMemorySize();
       mBlockSize         = cc_round_upto16(aParms->mBlockSize);
       mBlockBoxSize      = cBlockHeaderSize + mBlockSize;
       mBlockBoxArraySize = cc_round_upto16(cNewArrayExtraMemory + aParms->mNumBlocks*mBlockBoxSize);
       mFreeListNextSize  = cc_round_upto16(cNewArrayExtraMemory + (aParms->mNumBlocks + 1)*sizeof(AtomicLFIndex));
 
-      mMemorySize = mStateSize + mBlockBoxArraySize + mFreeListNextSize;
+      mMemorySize = mBlockBoxArraySize + mFreeListNextSize;
    }
 };
 
@@ -112,12 +67,17 @@ int BlockPoolLFFreeList::getMemorySize(BlockPoolParms* aParms)
 
 BlockPoolLFFreeList::BlockPoolLFFreeList()
 {
-   // All null.
-   mX = 0;
    mOwnMemoryFlag = false;
    mMemory = 0;
    mFreeListNext = 0;
    mBlockBoxArray=0;
+
+   mNumBlocks = 0;
+   mBlockSize = 0;
+   mBlockBoxSize = 0;
+   mPoolIndex = 0;
+   mFreeListNumNodes = 0;
+   mFreeListSize = 0;
 }
 
 BlockPoolLFFreeList::~BlockPoolLFFreeList()
@@ -126,7 +86,7 @@ BlockPoolLFFreeList::~BlockPoolLFFreeList()
 }
 
 //******************************************************************************
-//******************************************************************************
+;//******************************************************************************
 //******************************************************************************
 // This initializes the block pool. It allocates memory for the block array
 // and initializes the index stack. It is passed the number of blocks to
@@ -174,7 +134,6 @@ void BlockPoolLFFreeList::initialize(BlockPoolParms* aParms)
    // Calculate memory addresses.
    MemoryPtr tMemoryPtr(mMemory);
 
-   char* tStateMemory         = tMemoryPtr.cfetch_add(tMemorySize.mStateSize);
    char* tBlockBoxArrayMemory = tMemoryPtr.cfetch_add(tMemorySize.mBlockBoxArraySize);
    char* tFreeListNextMemory  = tMemoryPtr.cfetch_add(tMemorySize.mFreeListNextSize);
 
@@ -183,19 +142,15 @@ void BlockPoolLFFreeList::initialize(BlockPoolParms* aParms)
    //***************************************************************************
    // Initialize state.
 
-   // Construct the state.
-   if (aParms->mConstructorFlag)
-   {
-      // Call the constructor.
-      mX = new(tStateMemory)BlockPoolLFFreeListState;
-   }
-   else
-   {
-      // The constructor has already been called.
-      mX = (BlockPoolLFFreeListState*)tStateMemory;
-   }
-   // Initialize the state.
-   mX->initialize(aParms);
+   // Store members.
+   mNumBlocks = aParms->mNumBlocks;
+   mBlockSize = cc_round_upto16(aParms->mBlockSize);
+   mBlockBoxSize = cBlockHeaderSize + mBlockSize;
+   mPoolIndex = aParms->mPoolIndex;
+
+   // Allocate for one extra dummy node.
+   mFreeListNumNodes = aParms->mNumBlocks + 1;
+   mFreeListSize = 0;
 
    //***************************************************************************
    //***************************************************************************
@@ -206,59 +161,41 @@ void BlockPoolLFFreeList::initialize(BlockPoolParms* aParms)
    mBlockBoxArray = tBlockBoxArrayMemory;
    mBlockBoxArrayPtr.set(tBlockBoxArrayMemory);
 
-   // Initialize the block headers, if they have not
-   // already been initialized.
-   if (aParms->mConstructorFlag)
+   // Initialize block headers.
+   for (int i = 0; i < mNumBlocks; i++)
    {
-      // Initialize block headers.
-      for (int i = 0; i < mX->mNumBlocks; i++)
-      {
-         // Header pointer.
-         BlockHeader* tHeader = getHeaderPtr(i);
-         // Call Header constructor.
-         new(tHeader)BlockHeader;
-         // Set header variables.
-         tHeader->mBlockHandle.set(mX->mPoolIndex, i);
-      }
+      // Header pointer.
+      BlockHeader* tHeader = getHeaderPtr(i);
+      // Call Header constructor.
+      new(tHeader)BlockHeader;
+      // Set header variables.
+      tHeader->mBlockHandle.set(mPoolIndex, i);
    }
 
    // Construct the linked list array.
-   if (aParms->mConstructorFlag)
-   {
-      // Call the constructor.
-      mFreeListNext = new(tFreeListNextMemory)AtomicLFIndex[mX->mFreeListNumNodes];
-   }
-   else
-   {
-      // The constructor has already been called.
-      mFreeListNext = (AtomicLFIndex*)tFreeListNextMemory;
-   }
+   mFreeListNext = new(tFreeListNextMemory)AtomicLFIndex[mFreeListNumNodes];
 
    //***************************************************************************
    //***************************************************************************
    //***************************************************************************
    // Initialize free list.
 
-   // Initialize linked list, if it has not already been initialized.
-   if (aParms->mConstructorFlag)
+   // Initialize linked list array. Each node next node is the one after it.
+   for (int i = 0; i < mFreeListNumNodes - 1; i++)
    {
-      // Initialize linked list array. Each node next node is the one after it.
-      for (int i = 0; i < mX->mFreeListNumNodes - 1; i++)
-      {
-         mFreeListNext[i].store(LFIndex(i + 1, 0));
-      }
-      // The last node has no next node.
-      mFreeListNext[mX->mFreeListNumNodes - 1].store(LFIndex(cInvalid, 0));
-
-      // List head points to the first node.
-      mX->mFreeListHead.store(LFIndex(0, 0));
-      // List size is initially a full stack.
-      mX->mFreeListSize = mX->mFreeListNumNodes;
-
-      // Pop the dummy node.
-      int tDummyNode;
-      listPop(&tDummyNode);
+      mFreeListNext[i].store(LFIndex(i + 1, 0));
    }
+   // The last node has no next node.
+   mFreeListNext[mFreeListNumNodes - 1].store(LFIndex(cInvalid, 0));
+
+   // List head points to the first node.
+   mFreeListHead.store(LFIndex(0, 0));
+   // List size is initially a full stack.
+   mFreeListSize = mFreeListNumNodes;
+
+   // Pop the dummy node.
+   int tDummyNode;
+   listPop(&tDummyNode);
 
    //***************************************************************************
    //***************************************************************************
@@ -302,7 +239,7 @@ void BlockPoolLFFreeList::finalize()
 
 int BlockPoolLFFreeList::size()
 { 
-   return mX->mFreeListSize.load(memory_order_relaxed);
+   return mFreeListSize.load(memory_order_relaxed);
 }
 
 //******************************************************************************
@@ -322,7 +259,7 @@ bool BlockPoolLFFreeList::allocate(void** aBlockPointer,BlockHandle* aBlockHandl
       // Return a pointer to the block at that index.
       if (aBlockPointer)
       {
-         *aBlockPointer = mBlockBoxArrayPtr.vplus(mX->mBlockBoxSize*tBlockIndex + cBlockHeaderSize);
+         *aBlockPointer = mBlockBoxArrayPtr.vplus(mBlockBoxSize*tBlockIndex + cBlockHeaderSize);
 #if 0
          *aBlockPointer = getBlockPtr(tBlockIndex);
 #endif
@@ -373,7 +310,7 @@ void BlockPoolLFFreeList::deallocate(BlockHandle aBlockHandle)
 
 void* BlockPoolLFFreeList::getBlockPtr(BlockHandle aBlockHandle)
 {
-   return mBlockBoxArrayPtr.vplus(mX->mBlockBoxSize*aBlockHandle.mBlockIndex + cBlockHeaderSize);
+   return mBlockBoxArrayPtr.vplus(mBlockBoxSize*aBlockHandle.mBlockIndex + cBlockHeaderSize);
 #if 0
    // Return the address of the block within the block array.
    return getBlockPtr(aBlockHandle.mBlockIndex);
@@ -387,9 +324,9 @@ void* BlockPoolLFFreeList::getBlockPtr(BlockHandle aBlockHandle)
 
 char* BlockPoolLFFreeList::getBlockBoxPtr(int aBlockIndex)
 {
-   return mBlockBoxArrayPtr.cplus(mX->mBlockBoxSize*aBlockIndex + cBlockHeaderSize);
+   return mBlockBoxArrayPtr.cplus(mBlockBoxSize*aBlockIndex + cBlockHeaderSize);
 #if 0
-   char*  tBlockBox = &mBlockBoxArray[mX->mBlockBoxSize*aIndex];
+   char*  tBlockBox = &mBlockBoxArray[mBlockBoxSize*aIndex];
    return tBlockBox;
 #endif
 }
@@ -401,11 +338,11 @@ char* BlockPoolLFFreeList::getBlockBoxPtr(int aBlockIndex)
 
 BlockHeader* BlockPoolLFFreeList::getHeaderPtr(int aIndex)
 {
-   char* tBlockBox = mBlockBoxArrayPtr.cplus(mX->mBlockBoxSize*aIndex);
+   char* tBlockBox = mBlockBoxArrayPtr.cplus(mBlockBoxSize*aIndex);
    BlockHeader* tHeader = (BlockHeader*)tBlockBox;
    return tHeader;
 #if 0
-   char* tBlockBox = &mBlockBoxArray[mX->mBlockBoxSize*aIndex];
+   char* tBlockBox = &mBlockBoxArray[mBlockBoxSize*aIndex];
    BlockHeader* tHeader = (BlockHeader*)tBlockBox;
    return tHeader;
 #endif
@@ -418,10 +355,10 @@ BlockHeader* BlockPoolLFFreeList::getHeaderPtr(int aIndex)
 
 char* BlockPoolLFFreeList::getBlockPtr(int aBlockIndex)
 {
-   return mBlockBoxArrayPtr.cplus(mX->mBlockBoxSize*aBlockIndex + cBlockHeaderSize);
+   return mBlockBoxArrayPtr.cplus(mBlockBoxSize*aBlockIndex + cBlockHeaderSize);
 
 #if 0
-   char*  tBlockBox = &mBlockBoxArray[mX->mBlockBoxSize*aIndex];
+   char*  tBlockBox = &mBlockBoxArray[mBlockBoxSize*aIndex];
    char*  tBlock = tBlockBox + cBlockHeaderSize;
    return tBlock;
 #endif
@@ -475,7 +412,7 @@ bool BlockPoolLFFreeList::listPop(int* aNodeIndex)
 {
    // Store the head node in a temp.
    // This is the node that will be detached.
-   LFIndex tHead = mX->mFreeListHead.load(memory_order_relaxed);
+   LFIndex tHead = mFreeListHead.load(memory_order_relaxed);
 
    int tLoopCount=0;
    while (true)
@@ -484,11 +421,11 @@ bool BlockPoolLFFreeList::listPop(int* aNodeIndex)
       if (tHead.mIndex == cInvalid) return false;
 
       // Set the head node to be the node that is after the head node.
-      if (mX->mFreeListHead.compare_exchange_weak(tHead, LFIndex(mFreeListNext[tHead.mIndex].load(memory_order_relaxed).mIndex,tHead.mCount+1),memory_order_acquire,memory_order_relaxed)) break;
+      if (mFreeListHead.compare_exchange_weak(tHead, LFIndex(mFreeListNext[tHead.mIndex].load(memory_order_relaxed).mIndex,tHead.mCount+1),memory_order_acquire,memory_order_relaxed)) break;
 
       if (++tLoopCount==10000) cc_throw(103);
    }
-   mX->mFreeListSize.fetch_sub(1,memory_order_relaxed);
+   mFreeListSize.fetch_sub(1,memory_order_relaxed);
 
    // Return the detached original head node.
    *aNodeIndex = tHead.mIndex - 1;
@@ -506,7 +443,7 @@ bool BlockPoolLFFreeList::listPush(int aNodeIndex)
    int tNodeIndex = aNodeIndex + 1;
 
    // Store the head node in a temp.
-   LFIndex tHead = mX->mFreeListHead.load(memory_order_relaxed);
+   LFIndex tHead = mFreeListHead.load(memory_order_relaxed);
 
    int tLoopCount=0;
    while (true)
@@ -515,13 +452,13 @@ bool BlockPoolLFFreeList::listPush(int aNodeIndex)
       mFreeListNext[tNodeIndex].store(tHead,memory_order_relaxed);
 
       // The pushed node is the new head node.
-      atomic<short int>* tListHeadIndexPtr = (std::atomic<short int>*)&mX->mFreeListHead;
+      atomic<short int>* tListHeadIndexPtr = (std::atomic<short int>*)&mFreeListHead;
       if ((*tListHeadIndexPtr).compare_exchange_weak(tHead.mIndex, tNodeIndex,memory_order_release,memory_order_relaxed)) break;
       if (++tLoopCount == 10000) cc_throw(103);
    }
 
    // Done.
-   mX->mFreeListSize.fetch_add(1,memory_order_relaxed);
+   mFreeListSize.fetch_add(1,memory_order_relaxed);
    return true;
 }
 

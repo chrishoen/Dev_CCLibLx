@@ -16,46 +16,6 @@ Description:
 namespace CC
 {
 
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// This returns the number of bytes that an instance of this class
-// will need to be allocated for it.
- 
-int BlockBoxArrayState::getMemorySize()
-{
-   return cc_round_upto16(sizeof(BlockBoxArrayState));
-}
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// Constructor, initialize members for an empty stack of size zero 
-
-BlockBoxArrayState::BlockBoxArrayState()
-{
-   // All null
-   mNumBlocks=0;
-   mBlockSize=0;
-   mBlockBoxSize=0;
-   mPoolIndex=0;
-}
-
-void BlockBoxArrayState::initialize(BlockPoolParms* aParms)
-{
-   // Do not initialize, if already initialized.
-   if (!aParms->mConstructorFlag) return;
-
-   // Store members.
-   mNumBlocks    = aParms->mNumBlocks;
-   mBlockSize    = cc_round_upto16(aParms->mBlockSize);
-   mBlockBoxSize = mBlockSize + cBlockHeaderSize;;
-   mPoolIndex    = aParms->mPoolIndex;
-}
 
 //******************************************************************************
 //******************************************************************************
@@ -66,7 +26,6 @@ class BlockBoxArray::MemorySize
 {
 public:
    // Members.
-   int mStateSize;
    int mBlockSize;
    int mBlockBoxSize;
    int mBlockBoxArraySize;
@@ -75,11 +34,10 @@ public:
    // Calculate and store memory sizes.
    MemorySize(BlockPoolParms* aParms)
    {
-      mStateSize         = BlockBoxArrayState::getMemorySize();
       mBlockSize         = cc_round_upto16(aParms->mBlockSize);
       mBlockBoxSize      = cBlockHeaderSize + mBlockSize;
       mBlockBoxArraySize = cc_round_upto16(cNewArrayExtraMemory + aParms->mNumBlocks*mBlockBoxSize);
-      mMemorySize        = mStateSize + mBlockBoxArraySize;
+      mMemorySize        = mBlockBoxArraySize;
    }
 };
 
@@ -105,11 +63,14 @@ int BlockBoxArray::getMemorySize(BlockPoolParms* aParms)
 
 BlockBoxArray::BlockBoxArray()
 {
-   // All null
-   mX = 0;
    mOwnMemoryFlag = false;
    mMemory = 0;
    mBlockBoxArray=0;
+
+   mNumBlocks = 0;
+   mBlockSize = 0;
+   mBlockBoxSize = 0;
+   mPoolIndex = 0;
 }
 
 BlockBoxArray::~BlockBoxArray()
@@ -125,9 +86,9 @@ BlockBoxArray::~BlockBoxArray()
 
 void BlockBoxArray::initialize(BlockPoolParms* aParms,void* aMemory)
 {
-   //---------------------------------------------------------------------------
-   //---------------------------------------------------------------------------
-   //---------------------------------------------------------------------------
+   //***************************************************************************
+   //***************************************************************************
+   //***************************************************************************
    // Initialize memory.
 
    // Deallocate memory, if any exists.
@@ -154,40 +115,31 @@ void BlockBoxArray::initialize(BlockPoolParms* aParms,void* aMemory)
    // Calculate memory addresses.
    MemoryPtr tMemoryPtr(mMemory);
 
-   char* tStateMemory         = tMemoryPtr.cfetch_add(tMemorySize.mStateSize);
    char* tBlockBoxArrayMemory = tMemoryPtr.cfetch_add(tMemorySize.mBlockBoxArraySize);
 
-   // Construct the state.
-   if (aParms->mConstructorFlag)
-   {
-      // Call the constructor.
-      mX = new(tStateMemory)BlockBoxArrayState;
-   }
-   else
-   {
-      // The constructor has already been called.
-      mX = (BlockBoxArrayState*)tStateMemory;
-   }
+   //***************************************************************************
+   //***************************************************************************
+   //***************************************************************************
+   // Initialize variables.
+
    // Initialize the state.
-   mX->initialize(aParms);
+   mNumBlocks = aParms->mNumBlocks;
+   mBlockSize = cc_round_upto16(aParms->mBlockSize);
+   mBlockBoxSize = mBlockSize + cBlockHeaderSize;;
+   mPoolIndex = aParms->mPoolIndex;
 
    // Set the array pointer value.
    mBlockBoxArray = tBlockBoxArrayMemory;
 
-   // Initialize the block headers, if they have not
-   // already been initialized.
-   if (aParms->mConstructorFlag)
+   // Initialize block headers.
+   for (int i = 0; i < mNumBlocks; i++)
    {
-      // Initialize block headers.
-      for (int i = 0; i < mX->mNumBlocks; i++)
-      {
-         // Header pointer.
-         BlockHeader* tHeader = getHeaderPtr(i);
-         // Call Header constructor.
-         new(tHeader)BlockHeader;
-         // Set header variables.
-         tHeader->mBlockHandle.set(mX->mPoolIndex, i);
-      }
+      // Header pointer.
+      BlockHeader* tHeader = getHeaderPtr(i);
+      // Call Header constructor.
+      new(tHeader)BlockHeader;
+      // Set header variables.
+      tHeader->mBlockHandle.set(mPoolIndex, i);
    }
 
    // Store block array parameters. These can be used elsewhere.
@@ -220,7 +172,7 @@ void BlockBoxArray::finalize()
 
 char* BlockBoxArray::getBlockBoxPtr(int aIndex)
 {
-   char*  tBlockBox = &mBlockBoxArray[mX->mBlockBoxSize*aIndex];
+   char*  tBlockBox = &mBlockBoxArray[mBlockBoxSize*aIndex];
    return tBlockBox;
 }
 
@@ -231,7 +183,7 @@ char* BlockBoxArray::getBlockBoxPtr(int aIndex)
 
 BlockHeader* BlockBoxArray::getHeaderPtr(int aIndex)
 {
-   char*  tBlockBox = &mBlockBoxArray[mX->mBlockBoxSize*aIndex];
+   char*  tBlockBox = &mBlockBoxArray[mBlockBoxSize*aIndex];
    BlockHeader* tHeader = (BlockHeader*)tBlockBox;
    return tHeader;
 }
@@ -243,7 +195,7 @@ BlockHeader* BlockBoxArray::getHeaderPtr(int aIndex)
 
 char* BlockBoxArray::getBlockPtr(int aIndex)
 {
-   char*  tBlockBox = &mBlockBoxArray[mX->mBlockBoxSize*aIndex];
+   char*  tBlockBox = &mBlockBoxArray[mBlockBoxSize*aIndex];
    char*  tBlock = tBlockBox + cBlockHeaderSize;
    return tBlock;
 }

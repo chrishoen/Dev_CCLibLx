@@ -15,58 +15,14 @@ it uses a synchronization lock around critical sections.
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-// This encapsulates a stack of indices to be used with containers that 
-// implement free lists of blocks.
 
 namespace CC
 {
-
-   
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-// State variables for the object. These are located in a separate class so 
-// that they can be located in external memory.
-
-class BlockPoolLMIndexStackState
-{
-public:
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Class.
-
-   // This returns the number of bytes that an instance of this class
-   // will need to be allocated for it.
-   static int getMemorySize();
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Members.
-
-   // Index into the array.
-   int mIndex;
-
-   // Size of the array, number of elements allocated.
-   int mNumElements;
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Methods.
-
-   // Constructor.
-   BlockPoolLMIndexStackState();
-
-   // Initialize.
-   void initialize(BlockPoolParms* aParms);
-};
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
+// This encapsulates a stack of indices to be used with containers that 
+// implement free lists of blocks.
 
 class BlockPoolLMIndexStack : public BlockPoolBaseIndexStack
 {
@@ -101,9 +57,16 @@ public:
    // Array of indices for the stack.
    int* mElement;
 
-   // State variables for the stack. These are located in a separate class
-   // so that they can be located in externale memory.
-   BlockPoolLMIndexStackState* mX;
+   //***************************************************************************
+   //***************************************************************************
+   //***************************************************************************
+   // Members.
+
+   // Index into the array.
+   int mIndex;
+
+   // Size of the array, number of elements allocated.
+   int mNumElements;
 
    //***************************************************************************
    //***************************************************************************

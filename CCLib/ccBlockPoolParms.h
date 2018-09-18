@@ -62,18 +62,6 @@ public:
    // block pool.
    void* mMemory;
 
-   // If true then constructors are called for all internal objects created
-   // for the block pool. If false then the constructors are not called.
-   // This is false if the block pool resides in shared memory and has
-   // already been created. This is true otherwise.
-   bool mConstructorFlag;
-
-   // If true then lock free algorithms will be used and allocations,
-   // deallocations will be thread safe.
-   // If false then lock free algorithms will not be used and allocations,
-   // deallocations will not be thread safe.
-   bool mLockFreeFlag;
-
    // If true then execptions will not be throw when an allocation is 
    // requested on an empty block pool. If true then an exception will 
    // thrown.

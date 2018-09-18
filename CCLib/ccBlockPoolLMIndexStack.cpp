@@ -21,52 +21,20 @@ namespace CC
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// Constructor, initialize members for an empty stack of size zero. 
-
-int BlockPoolLMIndexStackState::getMemorySize()
-{
-   return cc_round_upto16(sizeof(BlockPoolLMIndexStackState));
-}
-
-BlockPoolLMIndexStackState::BlockPoolLMIndexStackState()
-{
-   // All null.
-   mNumElements = 0;
-   mIndex       = 0;
-}
-
-void BlockPoolLMIndexStackState::initialize(BlockPoolParms* aParms)
-{
-   // Do not initialize, if already initialized.
-   if (!aParms->mConstructorFlag) return;
-
-   // Initialize variables.
-   mIndex = 0;
-   mNumElements = aParms->mNumBlocks;
-}
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
 // This local class calculates and stores the memory sizes needed by the class.
 
 class BlockPoolLMIndexStack::MemorySize
 {
 public:
    // Members.
-   int mStateSize;
    int mArraySize;
    int mMemorySize;
 
    // Calculate and store memory sizes.
    MemorySize(BlockPoolParms* aParms)
    {
-      mStateSize = BlockPoolLMIndexStackState::getMemorySize();
       mArraySize = cc_round_upto16(cNewArrayExtraMemory + aParms->mNumBlocks*sizeof(int));
-      mMemorySize = mStateSize + mArraySize;
+      mMemorySize = mArraySize;
    }
 };
 
@@ -92,11 +60,12 @@ int BlockPoolLMIndexStack::getMemorySize(BlockPoolParms* aParms)
 
 BlockPoolLMIndexStack::BlockPoolLMIndexStack()
 {
-   // All null.
-   mX = 0;
    mElement = 0;
    mOwnMemoryFlag = false;
    mMemory = 0;
+
+   mNumElements = 0;
+   mIndex = 0;
 }
 
 //******************************************************************************
@@ -146,7 +115,6 @@ void BlockPoolLMIndexStack::initialize(BlockPoolParms* aParms,void* aMemory)
    // Calculate memory addresses.
    MemoryPtr tMemoryPtr(mMemory);
 
-   char* tStateMemory = tMemoryPtr.cfetch_add(tMemorySize.mStateSize);
    char* tArrayMemory = tMemoryPtr.cfetch_add(tMemorySize.mArraySize);
 
    //***************************************************************************
@@ -154,41 +122,18 @@ void BlockPoolLMIndexStack::initialize(BlockPoolParms* aParms,void* aMemory)
    //***************************************************************************
    // Initialize variables.
 
-   // Construct the state.
-   if (aParms->mConstructorFlag)
-   {
-      // Call the constructor.
-      mX = new(tStateMemory)BlockPoolLMIndexStackState;
-   }
-   else
-   {
-      // The constructor has already been called.
-      mX = (BlockPoolLMIndexStackState*)tStateMemory;
-   }
-   // Initialize the state.
-   mX->initialize(aParms);
+   // Initialize variables.
+   mIndex = 0;
+   mNumElements = aParms->mNumBlocks;
 
-   // Construct the element array.
-   if (aParms->mConstructorFlag)
-   {
-      // Call the constructor.
-      mElement = new(tArrayMemory) int[mX->mNumElements];
-   }
-   else
-   {
-      // The constructor has already been called.
-      mElement = (int*)tArrayMemory;
-   }
+   // Construct the element array.Call the constructor with placement new.
+   mElement = new(tArrayMemory) int[mNumElements];
 
-   // Initialize the element array, if it has not already been initialized.
-   if (aParms->mConstructorFlag)
+   // Push the indices of the blocks in the array onto the index stack.
+   // For aAllocate==10 this will push 9,7,8,6,5,4,3,2,1,0
+   for (int i = mNumElements - 1; i >= 0; i--)
    {
-      // Push the indices of the blocks in the array onto the index stack.
-      // For aAllocate==10 this will push 9,7,8,6,5,4,3,2,1,0
-      for (int i = mX->mNumElements - 1; i >= 0; i--)
-      {
-         push(i);
-      }
+      push(i);
    }
 }
 
@@ -221,16 +166,16 @@ bool BlockPoolLMIndexStack::push(int aValue)
    mSynchLock.lock();
 
    // Guard for stack full.
-   if (mX->mIndex == mX->mNumElements)
+   if (mIndex == mNumElements)
    {
       mSynchLock.unlock();
       return false;
    }
 
    // Copy the source element to the element at the stack index.
-   mElement[mX->mIndex] = aValue;
+   mElement[mIndex] = aValue;
    // Increment the index.
-   mX->mIndex++;
+   mIndex++;
 
    // Leave critical section.
    mSynchLock.unlock();
@@ -250,16 +195,16 @@ bool BlockPoolLMIndexStack::pop(int* aValue)
    mSynchLock.lock();
 
    // Guard for stack empty.
-   if (mX->mIndex == 0)
+   if (mIndex == 0)
    {
       mSynchLock.unlock();
       return false;
    }
 
    // Copy the element below the stack index to the destination element.
-   *aValue = mElement[mX->mIndex - 1];
+   *aValue = mElement[mIndex - 1];
    // Decrement the index.
-   mX->mIndex--;
+   mIndex--;
 
    // Leave critical section.
    mSynchLock.unlock();
@@ -275,7 +220,7 @@ bool BlockPoolLMIndexStack::pop(int* aValue)
 
 int BlockPoolLMIndexStack::size()
 {
-   return mX->mIndex;
+   return mIndex;
 }
 
 //******************************************************************************
