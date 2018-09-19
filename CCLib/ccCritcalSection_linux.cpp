@@ -38,6 +38,8 @@ void* createCriticalSection()
    pthread_mutex_t* tMutex = new pthread_mutex_t;
    ret = pthread_mutex_init(tMutex, NULL);
    chkerror(ret, "pthread_mutex_init");
+
+   return (void*)tMutex;
 }
 
 //******************************************************************************
