@@ -5,7 +5,7 @@
 Locked Mutex Packet Queue.
 
 It is multiple writer single reader thread safe.
-It lockes with semaphores, blocking.
+It lockes with critcal sections for mutual exclusion, blocking.
 It is shared memory safe.
 It is zero copy.
 
@@ -17,16 +17,15 @@ against concurrency contentions.
 It is thread safe for separate multiple writer and single reader threads.
 
 It implements the Michael and Scott algorithm for blocking queues. It 
-uses mutex protection. It maintains storage for the objects by implementing a
-free list that also uses mutex protection. 
+uses critcal sections for mutex protection. It maintains storage for the
+objects by implementing a free list that also uses critical section mutex
+protection. 
 
 =============================================================================*/
 
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-
-#include "ccSynchLock.h"
 
 //******************************************************************************
 //******************************************************************************
@@ -41,7 +40,7 @@ namespace CC
 // State variables for the object. These are located in a separate class
 // so that they can be located in external memory.
 
-class LMObjectQueueState
+class LCObjectQueueState
 {
 public:
 
@@ -79,7 +78,7 @@ public:
    // Methods.
 
    // Constructor.
-   LMObjectQueueState();
+   LCObjectQueueState();
 
    // Initialize.
    void initialize(int aNumElements,int aElementSize,bool aConstructorFlag);
@@ -90,7 +89,7 @@ public:
 //******************************************************************************
 // Lock free object queue class.
 
-class LMObjectQueue
+class LCObjectQueue
 {
 public:
 
@@ -122,7 +121,7 @@ public:
 
    // State variables for the queue. These are located in a separate class
    // so that they can be located in externale memory.
-   LMObjectQueueState* mX;
+   LCObjectQueueState* mX;
 
    // Array of bytes, storage for the objects.
    // Size is NumElements + 1.
@@ -142,9 +141,9 @@ public:
    // Marks an invalid node.
    static const int  cInvalid = 0x80000000;
 
-   // Mutex.
-   SynchLock mTailMutex;
-   SynchLock mListMutex;
+   // Critical sections.
+   void* mTailCriticalSection;
+   void* mListCriticalSection;
 
    //***************************************************************************
    //***************************************************************************
@@ -171,8 +170,8 @@ public:
    //    void* aMemory
 
    // Constructor.
-   LMObjectQueue();
-  ~LMObjectQueue();
+   LCObjectQueue();
+  ~LCObjectQueue();
 
    // Allocate memory for the queue and free list arrays and initialize the
    // queue variables. 
@@ -215,16 +214,6 @@ public:
    //***************************************************************************
    //***************************************************************************
    //***************************************************************************
-   // Mutex Methods.
-
-   void lockList();
-   void unlockList();
-   void lockTail();
-   void unlockTail();
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
    // Helper methods.
 private:
    // Return a pointer to an object, based on its object index.
@@ -247,10 +236,10 @@ private:
 
    // includes
    #include <new>
-   #include "ccLMObjectQueue.h"
+   #include "ccLCObjectQueue.h"
 
    // Declare object queue
-   CC::LMObjectQueue mObjectQueue;
+   CC::LCObjectQueue mObjectQueue;
    // Initialize object queue
    mObjectQueue.initialize(100,sizeof(Class1A));
 

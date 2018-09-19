@@ -20,8 +20,8 @@ namespace CC
    static const int cBlockPool_MaxNumBlocks   = 32768 - 1;
 
    // Block pool types.
-   static const int cBlockPoolType_LMFreeList   = 1;
-   static const int cBlockPoolType_LFFreeList     = 2;
+   static const int cBlockPoolType_LCFreeList   = 1;
+   static const int cBlockPoolType_LFFreeList   = 2;
 
 //******************************************************************************
 //******************************************************************************

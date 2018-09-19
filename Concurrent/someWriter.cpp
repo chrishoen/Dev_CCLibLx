@@ -296,13 +296,12 @@ void Writer::writeType7(int aNumWrites)
       mMarkerWrite.doStart();
 
       int tIndex;
-      void* tPacket = gShare.mLMObjectQueue.startWrite(&tIndex);
+      void* tPacket = gShare.mLCObjectQueue.startWrite(&tIndex);
       if (tPacket)
       {
          Class1A* tObject = new(tPacket) Class1A;
          tObject->mCode1 = tCount;
-         tDelayA.delay();
-         gShare.mLMObjectQueue.finishWrite(tIndex);
+         gShare.mLCObjectQueue.finishWrite(tIndex);
          tPass=true;
       }
 

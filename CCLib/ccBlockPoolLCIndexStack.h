@@ -10,7 +10,6 @@ it uses a synchronization lock around critical sections.
 ==============================================================================*/
 
 #include "ccBlockPoolBaseIndexStack.h"
-#include "ccSynchLock.h"
 
 //******************************************************************************
 //******************************************************************************
@@ -24,7 +23,7 @@ namespace CC
 // This encapsulates a stack of indices to be used with containers that 
 // implement free lists of blocks.
 
-class BlockPoolLMIndexStack : public BlockPoolBaseIndexStack
+class BlockPoolLCIndexStack : public BlockPoolBaseIndexStack
 {
 public:
 
@@ -74,7 +73,7 @@ public:
    // Members.
 
    // This is a synchronization lock used to protect critical sections.
-   SynchLock mSynchLock;
+   void* mCriticalSection;
 
    //***************************************************************************
    //***************************************************************************
@@ -82,8 +81,8 @@ public:
    // Methods.
 
    // Constructor.
-   BlockPoolLMIndexStack();
-  ~BlockPoolLMIndexStack();
+   BlockPoolLCIndexStack();
+  ~BlockPoolLCIndexStack();
 
    // Initialize the stack to either allocate memory from the system heap or
    // to use external memory that has already been allocated for it.

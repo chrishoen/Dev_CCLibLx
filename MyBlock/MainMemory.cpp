@@ -28,7 +28,7 @@ void main_memory_initialize()
    // Create block pool.
    tBlockPoolParms.reset();
    tBlockPoolParms.mPoolIndex     = Some::cBlockPoolIndex_MyBlockA;
-   tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LMFreeList;
+   tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LCFreeList;
    tBlockPoolParms.mNumBlocks     = 3;
    tBlockPoolParms.mBlockSize = sizeof(Some::MyBlockA);
    tBlockPoolParms.mNoThrowFlag = true;
@@ -37,7 +37,7 @@ void main_memory_initialize()
    // Create block pool.
    tBlockPoolParms.reset();
    tBlockPoolParms.mPoolIndex = Some::cBlockPoolIndex_MyBlockB;
-   tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LMFreeList;
+   tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LFFreeList;
    tBlockPoolParms.mNumBlocks = 1000;
    tBlockPoolParms.mBlockSize = sizeof(Some::MyBlockB);
    CC::createBlockPool(&tBlockPoolParms);
@@ -45,7 +45,7 @@ void main_memory_initialize()
    // Create block pool.
    tBlockPoolParms.reset();
    tBlockPoolParms.mPoolIndex = Some::cBlockPoolIndex_MyBlockC;
-   tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LMFreeList;
+   tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LFFreeList;
    tBlockPoolParms.mNumBlocks = 1000;
    tBlockPoolParms.mBlockSize = sizeof(Some::MyBlockC);
    CC::createBlockPool(&tBlockPoolParms);
@@ -53,7 +53,7 @@ void main_memory_initialize()
    // Create block pool.
    tBlockPoolParms.reset();
    tBlockPoolParms.mPoolIndex     = Some::cBlockPoolIndex_MyBlockR;
-   tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LMFreeList;
+   tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LFFreeList;
    tBlockPoolParms.mNumBlocks     = 1000;
    tBlockPoolParms.mBlockSize     = sizeof(Some::MyBlockR);
    CC::createBlockPool(&tBlockPoolParms);

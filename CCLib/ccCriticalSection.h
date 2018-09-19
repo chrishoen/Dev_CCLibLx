@@ -1,14 +1,6 @@
 #pragma once
 
 /*==============================================================================
-
-Realtime infastructure library Threads
-
-This file contains classes that encapsulate standard rtos multithreading
-synchronization constructs. It supplies events, semaphores, and threads.
-The purpose of the classes is to wrap the rtos api thread synchronization
-calls.
-
 ==============================================================================*/
 
 //******************************************************************************
@@ -21,24 +13,25 @@ namespace CC
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-// This encapsulates a synchronization lock that is used to protect access
-// to critical sections of code.
+// These functions provide a synchronization lock that is used to protect
+// access to critical sections of code. These should be used around short
+// sections that do not block. These functions are intended to be cross
+// platform. They use a void* general purpose variable.
 
-class SynchLock
-{
-public:
+// Created a critical section. Pass the returned code to the following
+// functions.
+void* createCriticalSection();
 
-   SynchLock();
-   ~SynchLock();
-      
-   void lock();
-   void unlock();
+// Enter a critical section. This is used to lock a resource for a short
+// time interval.
+void enterCriticalSection(void* aCriticalSection);
 
-protected:
-   class Specific;
-   Specific* mSpecific;
-};
-   
+// Leave a critical section. This is used to unlock a resource.
+void leaveCriticalSection(void* aCriticalSection);
+
+// Destroy a critical section.
+void destroyCriticalSection(void* aCriticalSection);
+
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************

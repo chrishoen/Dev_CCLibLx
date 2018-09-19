@@ -57,7 +57,7 @@ void Share::initialize()
          mSRSWIntQueue.initialize(gParms.mNumElements);
          break;
       case 7:
-         mLMObjectQueue.initialize(gParms.mNumElements, sizeof(Class1A));
+         mLCObjectQueue.initialize(gParms.mNumElements, sizeof(Class1A));
          break;
       case 8:
          mLMIntQueue.initialize(gParms.mNumElements);

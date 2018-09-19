@@ -8,10 +8,11 @@ Description:
 
 #include "stdafx.h"
 
+#include "ccCriticalSection.h"
 #include "cc_functions.h"
 #include "ccDefs.h"
 #include "ccMemoryPtr.h"
-#include "ccBlockPoolLMIndexStack.h"
+#include "ccBlockPoolLCIndexStack.h"
 
 using namespace std;
 
@@ -23,7 +24,7 @@ namespace CC
 //******************************************************************************
 // This local class calculates and stores the memory sizes needed by the class.
 
-class BlockPoolLMIndexStack::MemorySize
+class BlockPoolLCIndexStack::MemorySize
 {
 public:
    // Members.
@@ -44,7 +45,7 @@ public:
 // This returns the number of bytes that an instance of this class
 // will need to be allocated for it.
 
-int BlockPoolLMIndexStack::getMemorySize(BlockPoolParms* aParms)
+int BlockPoolLCIndexStack::getMemorySize(BlockPoolParms* aParms)
 {
    MemorySize tMemorySize(aParms);
    return tMemorySize.mMemorySize;
@@ -58,7 +59,7 @@ int BlockPoolLMIndexStack::getMemorySize(BlockPoolParms* aParms)
 //******************************************************************************
 // Constructor, initialize members for an empty stack of size zero 
 
-BlockPoolLMIndexStack::BlockPoolLMIndexStack()
+BlockPoolLCIndexStack::BlockPoolLCIndexStack()
 {
    mElement = 0;
    mOwnMemoryFlag = false;
@@ -66,6 +67,8 @@ BlockPoolLMIndexStack::BlockPoolLMIndexStack()
 
    mNumElements = 0;
    mIndex = 0;
+
+   mCriticalSection = createCriticalSection();
 }
 
 //******************************************************************************
@@ -73,9 +76,11 @@ BlockPoolLMIndexStack::BlockPoolLMIndexStack()
 //******************************************************************************
 // Destructor, deallocate the array
 
-BlockPoolLMIndexStack::~BlockPoolLMIndexStack()
+BlockPoolLCIndexStack::~BlockPoolLCIndexStack()
 {
    finalize();
+
+   destroyCriticalSection(mCriticalSection);
 }
 
 //******************************************************************************
@@ -84,7 +89,7 @@ BlockPoolLMIndexStack::~BlockPoolLMIndexStack()
 // This initializes the stack to a fixed size. It initializes member
 // variables and and the stack array, given external memory.
 
-void BlockPoolLMIndexStack::initialize(BlockPoolParms* aParms,void* aMemory)
+void BlockPoolLCIndexStack::initialize(BlockPoolParms* aParms,void* aMemory)
 {
    //***************************************************************************
    //***************************************************************************
@@ -98,7 +103,7 @@ void BlockPoolLMIndexStack::initialize(BlockPoolParms* aParms,void* aMemory)
    // then allocate memory for it on the system heap.
    if (aMemory == 0)
    {
-      mMemory = malloc(BlockPoolLMIndexStack::getMemorySize(aParms));
+      mMemory = malloc(BlockPoolLCIndexStack::getMemorySize(aParms));
       mOwnMemoryFlag = true;
    }
    // If the instance of this class is to reside in external memory
@@ -142,7 +147,7 @@ void BlockPoolLMIndexStack::initialize(BlockPoolParms* aParms,void* aMemory)
 //******************************************************************************
 // Deallocate memory for the stack.
 
-void BlockPoolLMIndexStack::finalize()
+void BlockPoolLCIndexStack::finalize()
 {
    if (mOwnMemoryFlag)
    {
@@ -160,15 +165,16 @@ void BlockPoolLMIndexStack::finalize()
 //******************************************************************************
 // Push a value onto the stack. Return false if the stack is full.
 
-bool BlockPoolLMIndexStack::push(int aValue)
+bool BlockPoolLCIndexStack::push(int aValue)
 {
-   // Enter critical section.
-   mSynchLock.lock();
+   // Lock.
+   enterCriticalSection(mCriticalSection);
 
    // Guard for stack full.
    if (mIndex == mNumElements)
    {
-      mSynchLock.unlock();
+      // Unlock.
+      leaveCriticalSection(mCriticalSection);
       return false;
    }
 
@@ -177,8 +183,8 @@ bool BlockPoolLMIndexStack::push(int aValue)
    // Increment the index.
    mIndex++;
 
-   // Leave critical section.
-   mSynchLock.unlock();
+   // Unlock.
+   leaveCriticalSection(mCriticalSection);
 
    // Done
    return true;
@@ -189,15 +195,16 @@ bool BlockPoolLMIndexStack::push(int aValue)
 //******************************************************************************
 // Pop a value off of the stack. Return false if the stack is empty.
 
-bool BlockPoolLMIndexStack::pop(int* aValue)
+bool BlockPoolLCIndexStack::pop(int* aValue)
 {
-   // Enter critical section.
-   mSynchLock.lock();
+   // Lock.
+   enterCriticalSection(mCriticalSection);
 
    // Guard for stack empty.
    if (mIndex == 0)
    {
-      mSynchLock.unlock();
+      // Unlock.
+      leaveCriticalSection(mCriticalSection);
       return false;
    }
 
@@ -206,8 +213,8 @@ bool BlockPoolLMIndexStack::pop(int* aValue)
    // Decrement the index.
    mIndex--;
 
-   // Leave critical section.
-   mSynchLock.unlock();
+   // Unlock.
+   leaveCriticalSection(mCriticalSection);
 
    // Return success.
    return true;
@@ -218,7 +225,7 @@ bool BlockPoolLMIndexStack::pop(int* aValue)
 //******************************************************************************
 // Return size.
 
-int BlockPoolLMIndexStack::size()
+int BlockPoolLCIndexStack::size()
 {
    return mIndex;
 }

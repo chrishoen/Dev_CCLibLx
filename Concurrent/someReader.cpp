@@ -308,12 +308,11 @@ void Reader::readType7(int aNumReads)
 
       mMarkerRead.doStart();
 
-      Class1A* tObject = (Class1A*)gShare.mLMObjectQueue.startRead(&tIndex);
+      Class1A* tObject = (Class1A*)gShare.mLCObjectQueue.startRead(&tIndex);
       if (tObject)
       {
          tCount = tObject->mCode1;
-         tDelayB.delay();
-         gShare.mLMObjectQueue.finishRead(tIndex);
+         gShare.mLCObjectQueue.finishRead(tIndex);
       }
 
       mMarkerRead.doStop();
@@ -599,11 +598,11 @@ void Reader::flushType7()
    while(true)
    {
 
-      Class1A* tObject = (Class1A*)gShare.mLMObjectQueue.startRead(&tIndex);
+      Class1A* tObject = (Class1A*)gShare.mLCObjectQueue.startRead(&tIndex);
       if (!tObject) break;
 
       tCount = tObject->mCode1;
-      gShare.mLMObjectQueue.finishRead(tIndex);
+      gShare.mLCObjectQueue.finishRead(tIndex);
 
       mCount++;
       mPassCount++;

@@ -5,12 +5,22 @@
 Single Reader Multiple Writer Value Queue class template. 
 
 It is multiple writer single reader thread safe.
-It is uses thread synchronization (semaphores).
+It lockes with critcal sections for mutual exclusion, blocking.
 It is shared memory safe.
 
-This implements a value queue. 
+This implements a queue of fixed size objects, where the queue provides the
+memory allocation for the objects (memory for the objects is contained
+within the queue). The queue is thread safe. It uses mutexes to guard
+against concurrency contentions.
 
-It is thread safe for multiple writer and single reader threads.
+It is thread safe for separate multiple writer and single reader threads.
+
+It implements the Michael and Scott algorithm for blocking queues. It
+uses critcal sections for mutex protection. It maintains storage for the
+objects by implementing a free list that also uses critical section mutex
+protection.
+
+
 
 ==============================================================================*/
 //******************************************************************************
@@ -21,7 +31,7 @@ It is thread safe for multiple writer and single reader threads.
 #include "ccDefs.h"
 #include "cc_functions.h"
 #include "ccMemoryPtr.h"
-#include "ccSynchLock.h"
+#include "ccCriticalSection.h"
 
 //******************************************************************************
 //******************************************************************************
@@ -35,7 +45,7 @@ namespace CC
 // State variables for the stack. These are located in a separate class
 // so that they can be located in external memory.
 
-class LMValueQueueState
+class LCValueQueueState
 {
 public:
 
@@ -48,7 +58,7 @@ public:
    // will need to be allocated for it.
    static int getMemorySize()
    {
-      return cc_round_upto16(sizeof(LMValueQueueState));
+      return cc_round_upto16(sizeof(LCValueQueueState));
    }
 
    //***************************************************************************
@@ -67,7 +77,7 @@ public:
    // Methods.
 
    // Constructor.
-   LMValueQueueState()
+   LCValueQueueState()
    {
       // All null
       mNumElements = 0;
@@ -93,7 +103,7 @@ public:
 //******************************************************************************
 
 template <class Element>
-class LMValueQueue
+class LCValueQueue
 {
 public:
 
@@ -114,7 +124,7 @@ public:
       // Calculate and store memory sizes.
       MemorySize(int aNumElements)
       {
-         mStateSize         = LMValueQueueState::getMemorySize();
+         mStateSize         = LCValueQueueState::getMemorySize();
          mElementArraySize  = cc_round_upto16(cNewArrayExtraMemory + (aNumElements + 1)*sizeof(Element));
          mMemorySize = mStateSize + mElementArraySize;
       }
@@ -150,7 +160,7 @@ public:
 
    // State variables for the queue. These are located in a separate class
    // so that they can be located in externale memory.
-   LMValueQueueState* mX;
+   LCValueQueueState* mX;
 
    // Array of values, storage for the values.
    // Size is NumElements + 1.
@@ -162,9 +172,8 @@ public:
    //***************************************************************************
    // Members.
 
-   // This is a mutex semaphore that is used to lock access to member 
-   // variables for write operations.
-   SynchLock mLock;
+   // Critical section.
+   void* mCriticalSection;
 
    //***************************************************************************
    //***************************************************************************
@@ -172,7 +181,7 @@ public:
    // Methods.
 
    // Constructor.
-   LMValueQueue()
+   LCValueQueue()
    {
       // All null.
       mX = 0;
@@ -181,11 +190,14 @@ public:
 
       // All null
       mElement = 0;
+
+      mCriticalSection = createCriticalSection();
    }
 
-   ~LMValueQueue()
+   ~LCValueQueue()
    {
       finalize();
+      destroyCriticalSection(mCriticalSection);
    }
 
    //***************************************************************************
@@ -212,7 +224,7 @@ public:
       // then allocate memory for it on the system heap.
       if (aMemory == 0)
       {
-         mMemory = malloc(LMValueQueue<Element>::getMemorySize(aNumElements));
+         mMemory = malloc(LCValueQueue<Element>::getMemorySize(aNumElements));
          mOwnMemoryFlag = true;
       }
       // If the instance of this class is to reside in external memory
@@ -236,12 +248,12 @@ public:
       if (aConstructorFlag)
       {
          // Call the constructor.
-         mX = new(tStateMemory)LMValueQueueState;
+         mX = new(tStateMemory)LCValueQueueState;
       }
       else
       {
          // The constructor has already been called.
-         mX = (LMValueQueueState*)tStateMemory;
+         mX = (LCValueQueueState*)tStateMemory;
       }
       // Initialize the state.
       mX->initialize(aNumElements,aConstructorFlag);
@@ -315,14 +327,15 @@ public:
    bool tryWrite (Element aElement)
    {
       // Lock.
-      mLock.lock();
+      enterCriticalSection(mCriticalSection);
 
       // Test if the queue is full.
       int tSize = mX->mPutIndex - mX->mGetIndex;
       if (tSize < 0) tSize = mX->mNumElements + tSize;
       if (tSize > mX->mNumElements - 2)
       {
-         mLock.unlock();
+         // Unlock.
+         leaveCriticalSection(mCriticalSection);
          return false;
       }
 
@@ -334,8 +347,8 @@ public:
       if(++tPutIndex == mX->mNumElements) tPutIndex = 0;
       mX->mPutIndex = tPutIndex;
 
-      // Done.
-      mLock.unlock();
+      // Unlock.
+      leaveCriticalSection(mCriticalSection);
       return true;
    }
 

@@ -15,8 +15,8 @@
 #include "ccLFObjectQueue.h"
 #include "ccLFPointerQueue.h"
 #include "ccSRSWValueQueue.h"
-#include "ccLMObjectQueue.h"
-#include "ccLMValueQueue.h"
+#include "ccLCObjectQueue.h"
+#include "ccLCValueQueue.h"
 
 namespace Some
 {
@@ -78,9 +78,9 @@ public:
    CC::LFObjectQueue          mLFObjectQueue;
    CC::LFValueQueue<int>      mLFIntQueue;
    CC::SRSWValueQueue<int>    mSRSWIntQueue;
-   CC::LMObjectQueue          mLMObjectQueue;
-   CC::LMValueQueue<int>      mLMIntQueue;
-   CC::LMValueQueue<void*>    mLMPointerQueue;
+   CC::LCObjectQueue          mLCObjectQueue;
+   CC::LCValueQueue<int>      mLMIntQueue;
+   CC::LCValueQueue<void*>    mLMPointerQueue;
 
    //***************************************************************************
    //***************************************************************************

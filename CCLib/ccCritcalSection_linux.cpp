@@ -9,7 +9,7 @@
 
 #include <pthread.h> 
 
-#include "ccSynchLock.h"
+#include "ccCriticalSection.h"
 
 namespace CC
 {
@@ -28,84 +28,58 @@ void chkerror(int aRet, char* aLabel)
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
+// Created a critical section. Pass the returned code to the following
+// functions.
 
-class SynchLock::Specific
+void* createCriticalSection()
 {
-public:
-   pthread_rwlock_t mRWLock;
-   pthread_mutex_t mMutex;
-};
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-
-SynchLock::SynchLock() 
-{
-   mSpecific = new Specific;
    int ret;
 
-   ret = pthread_mutex_init(&mSpecific->mMutex, NULL);
+   pthread_mutex_t* tMutex = new pthread_mutex_t;
+   ret = pthread_mutex_init(tMutex, NULL);
    chkerror(ret, "pthread_mutex_init");
-   return;
-
-   ret = pthread_rwlock_init(&mSpecific->mRWLock, 0);
-   chkerror(ret, "pthread_rwlock_init");
-   return;
 }
 
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
+// Enter a critical section. This is used to lock a resource for a short
+// time interval.
 
-SynchLock::~SynchLock() 
+void enterCriticalSection(void* aCriticalSection)
 {
    int ret;
 
-   ret = pthread_mutex_destroy(&mSpecific->mMutex);
-   chkerror(ret, "pthread_mutex_destroy");
-   delete mSpecific;
-   return;
-
-   ret = pthread_rwlock_destroy(&mSpecific->mRWLock);
-   chkerror(ret, "pthread_rwlock_destroy");
-   delete mSpecific;
-   return;
-
-}
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-
-void SynchLock::lock()
-{
-   int ret;
-
-   ret = pthread_mutex_lock(&mSpecific->mMutex);
+   ret = pthread_mutex_lock((pthread_mutex_t*)aCriticalSection);
    chkerror(ret, "pthread_mutex_lock");
-   return;
-
-   ret = pthread_rwlock_wrlock(&mSpecific->mRWLock);
-   chkerror(ret, "pthread_rwlock_wrlock");
-   return;
 }
 
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
+// Leave a critical section. This is used to unlock a resource.
 
-void SynchLock::unlock()
+void leaveCriticalSection(void* aCriticalSection)
 {
    int ret;
 
-   ret = pthread_mutex_unlock(&mSpecific->mMutex);
+   ret = pthread_mutex_unlock((pthread_mutex_t*)aCriticalSection);
    chkerror(ret, "pthread_mutex_unlock");
-   return;
+}
 
-   ret = pthread_rwlock_unlock(&mSpecific->mRWLock);
-   chkerror(ret, "pthread_rwlock_unlock");
-   return;
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
+// Destroy a critical section.
+
+void destroyCriticalSection(void* aCriticalSection)
+{
+   int ret;
+
+   ret = pthread_mutex_destroy((pthread_mutex_t*)aCriticalSection);
+   chkerror(ret, "pthread_mutex_destroy");
+
+   delete aCriticalSection;
 }
 
 //******************************************************************************
