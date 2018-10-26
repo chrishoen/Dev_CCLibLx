@@ -1,100 +1,97 @@
 #pragma once
 
 /*==============================================================================
-Block pool parameter class
+
+Pointer queue that uses critical sections as locks.
+Single reader multiple writer pointer queue class template.
+It is multiple writer single reader thread safe.
+It locks with critcal sections for mutual exclusion, blocking.
+
 ==============================================================================*/
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-#include "ccMemoryPtr.h"
+
+#include "ccCriticalSection.h"
+
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
 
 namespace CC
 {
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
+// Value queue that uses critical sections as locks.
+// Single reader multiple writer value queue class template.
+// It is multiple writer single reader thread safe.
+// It locks with critcal sections for mutual exclusion, blocking.
 
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// Block pool constants.
-
-   // Block pool types.
-   static const int cBlockPool_MaxNumBlocks   = 32768 - 1;
-
-   // Block pool types.
-   static const int cBlockPoolType_LCFreeList   = 1;
-
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// Block pool parameters. These are passed to the create block pool call.
-
-class BlockPoolParms
+class LCPointerQueue
 {
 public:
 
    //***************************************************************************
    //***************************************************************************
    //***************************************************************************
-   // This returns the number of bytes that an instance of this class
-   // will need to be allocated for it.
+   // Members.
 
-   static int getMemorySize();
+   // Array of queue values, storage for the values. The values are void*s.
+   // NumElements is Size + 1.
+   // Index range is 0..Size.
+   void** mElement;
 
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Parameters that are passed to the create block pool call.
+   // Number of elements allocated.
+   int mNumElements;
 
-   // Unique index for the block pool.
-   int   mPoolIndex;
-
-   // Type of block pool.
-   int   mBlockPoolType;
-
-   // Number of blocks to allocate.
-   int   mNumBlocks;
-
-   // Block size in bytes.
-   int   mBlockSize;
-
-   // Pointer to external memory allocated for the entire block pool.
-   // If this is null then system heap memory is allocated for the entire
-   // block pool.
-   void* mMemory;
-
-   // If true then execptions will be throw when an allocation is 
-   // requested on an empty block pool. If false then an exception will 
-   // not be thrown.
-   bool mThrowFlag;
+   // Queue array indices.
+   int mPutIndex;
+   int mGetIndex;
 
    //***************************************************************************
    //***************************************************************************
    //***************************************************************************
-   // Parameters that are used internally to the block pool.
+   // Members.
 
-   // Block box size in bytes.
-   int   mBlockBoxSize;
-
-   // Block header size in bytes.
-   int   mBlockHeaderSize;
-
-   // This contains the address of the first block box in the block box array.
-   // It can be used to obtain the address of a block header or a block body.
-   MemoryPtr mBlockBoxArrayPtr;
-
-   // True if block pool has been created.
-   bool  mValidFlag;
+   // Critical section.
+   void* mCriticalSection;
 
    //***************************************************************************
    //***************************************************************************
    //***************************************************************************
-   // Methods
+   // Methods.
 
    // Constructor.
-   BlockPoolParms();
-   void reset();
+   LCPointerQueue();
+   ~LCPointerQueue();
 
-   // Make parameters consistent. Check ranges.
-   void makeConsistent();
+   //***************************************************************************
+   //***************************************************************************
+   //***************************************************************************
+   // Methods.
+
+   // Allocate memory for the queue and initialize variables.
+   void initialize(int aSize);
+
+   // Deallocate memory.
+   void finalize();
+
+   //***************************************************************************
+   //***************************************************************************
+   //***************************************************************************
+   // Methods.
+
+   // Return the current size of the queue.
+   int size();
+
+   // Try to write a pointer to the queue. Return true if successful. 
+   // Return false if the queue is full.
+   bool tryWrite(void* aElement);
+
+   // Try to read a pointer from the queue. Return the pointer if successful.
+   // Return zero if the queue is empty.
+   void* tryRead();
 };
 
 //******************************************************************************

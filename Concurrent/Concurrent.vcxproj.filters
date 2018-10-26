@@ -2,14 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="CmdLineExec.cpp" />
-    <ClCompile Include="LFFreeList.cpp" />
-    <ClCompile Include="LFIntQueue.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainInit.cpp" />
     <ClCompile Include="MainMemory.cpp" />
     <ClCompile Include="Parms.cpp" />
     <ClCompile Include="someClass1.cpp" />
     <ClCompile Include="someMessage.cpp" />
+    <ClCompile Include="someMyBlockX.cpp" />
     <ClCompile Include="someReader.cpp" />
     <ClCompile Include="someReaderThread.cpp" />
     <ClCompile Include="someShare.cpp" />
@@ -18,25 +17,20 @@
     <ClCompile Include="someTesterThread.cpp" />
     <ClCompile Include="someThreads.cpp" />
     <ClCompile Include="someWriter.cpp" />
-    <ClCompile Include="someWriterReader.cpp" />
-    <ClCompile Include="someWriterReaderThread.cpp" />
     <ClCompile Include="someWriterThread.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Timing.cpp" />
-    <ClCompile Include="someMyBlockX.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CmdLineExec.h" />
     <ClInclude Include="LFBackoff.h" />
-    <ClInclude Include="LFFreeList.h" />
-    <ClInclude Include="LFIndex.h" />
-    <ClInclude Include="LFIntQueue.h" />
     <ClInclude Include="MainInit.h" />
     <ClInclude Include="MainMemory.h" />
     <ClInclude Include="Parms.h" />
     <ClInclude Include="someBlockPoolIndex.h" />
     <ClInclude Include="someClass1.h" />
     <ClInclude Include="someMessage.h" />
+    <ClInclude Include="someMyBlockX.h" />
     <ClInclude Include="someReader.h" />
     <ClInclude Include="someReaderThread.h" />
     <ClInclude Include="someShare.h" />
@@ -45,11 +39,8 @@
     <ClInclude Include="someTesterThread.h" />
     <ClInclude Include="someThreads.h" />
     <ClInclude Include="someWriter.h" />
-    <ClInclude Include="someWriterReader.h" />
-    <ClInclude Include="someWriterReaderThread.h" />
     <ClInclude Include="someWriterThread.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Timing.h" />
-    <ClInclude Include="someMyBlockX.h" />
   </ItemGroup>
 </Project>

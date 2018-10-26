@@ -7,8 +7,6 @@ Description:
 //******************************************************************************
 #include "stdafx.h"
 
-#include "LFIntQueue.h"
-#include "LFFreeList.h"
 #include "Parms.h"
 
 #define  _SOMESHARE_CPP_
@@ -39,34 +37,31 @@ void Share::initialize()
       switch (mType)
       {
       case 1:
-         LFIntQueue::initialize(gParms.mNumElements);
+         mSRSWIntQueue.reset();
          break;
       case 2:
-         mLFPointerQueue.initialize(gParms.mNumElements);
+         mSRSWObjectQueue.reset();
          break;
       case 3:
-         mLFObjectQueue.initialize(gParms.mNumElements, sizeof(Class1A));
+         mLCPointerQueue.initialize(gParms.mNumElements);
          break;
       case 4:
-         mLFValueQueue.initialize(gParms.mNumElements);
          break;
       case 5:
-         mLFIntQueue.initialize(gParms.mNumElements);
          break;
       case 6:
-         mSRSWIntQueue.initialize(gParms.mNumElements);
+         mSRSWIntQueue.reset();
          break;
       case 7:
          mLCObjectQueue.initialize(gParms.mNumElements, sizeof(Class1A));
          break;
       case 8:
-         mLMIntQueue.initialize(gParms.mNumElements);
+         mLCIntQueue.initialize(gParms.mNumElements);
          break;
       case 9:
-         mLMPointerQueue.initialize(gParms.mNumElements);
+         mLCPointerQueue.initialize(gParms.mNumElements);
          break;
       case 10:
-         mLMPointerQueue.initialize(gParms.mNumElements);
          break;
       case 11:
          break;
@@ -74,7 +69,6 @@ void Share::initialize()
          break;
       case 21:
       case 22:
-         mLFValueQueue.initialize(gParms.mNumElements);
          break;
       }
       break;
@@ -86,7 +80,6 @@ void Share::initialize()
    for (int i = 0; i < mNumWriters; i++)
    {
       mWriter[i].initialize(i);
-      mWriterReader[i].initialize(i);
       mWriterProcessor[i]=0;
    }
 
@@ -134,35 +127,6 @@ void Share::update1()
 
 void Share::update2()
 {
-   mWriterCount     = 0;
-   mWriterPassCount = 0;
-   mWriterFailCount = 0;
-   mWriterCheckSum  = 0;
-   mWriterMeanTime  = 0.0;
-
-   for (int i = 0; i < mNumWriters; i++)
-   {
-      mWriterCount     += mWriterReader[i].mWriteCount;
-      mWriterPassCount += mWriterReader[i].mWritePassCount;
-      mWriterFailCount += mWriterReader[i].mWriteFailCount;
-      mWriterCheckSum  += mWriterReader[i].mWriteCheckSum;
-      mWriterMeanTime  += mWriterReader[i].mMeanTimeWrite/mNumWriters;
-   }
-
-   mReaderCount     = 0;
-   mReaderPassCount = 0;
-   mReaderFailCount = 0;
-   mReaderCheckSum  = 0;
-   mReaderMeanTime  = 0.0;
-
-   for (int i = 0; i < mNumWriters; i++)
-   {
-      mReaderCount     += mWriterReader[i].mReadCount;
-      mReaderPassCount += mWriterReader[i].mReadPassCount;
-      mReaderFailCount += mWriterReader[i].mReadFailCount;
-      mReaderCheckSum  += mWriterReader[i].mReadCheckSum;
-      mReaderMeanTime  += mWriterReader[i].mMeanTimeRead/mNumWriters;
-   }
 }
 //******************************************************************************
 //******************************************************************************
@@ -214,8 +178,6 @@ void Share::show12()
    Prn::print(0, "Reader.mFailCount  %16s", my_stringLLU(tString, mReaderFailCount));
    Prn::print(0, "");
 
-   if (mType==1) LFIntQueue::show();
-
    Prn::print(0, "");
    Prn::print(0, "Writer.mMeanTime   %16.5f", mWriterMeanTime);
    Prn::print(0, "Reader.mMeanTime   %16.5f", mReaderMeanTime);
@@ -223,18 +185,10 @@ void Share::show12()
 
    double tWriterPass = (double)mWriterPassCount / (double)mWriterCount;
    double tReaderPass = (double)mReaderPassCount / (double)mReaderCount;
-   double tWriteRetry = (double)LFIntQueue::writeRetry() / (double)mWriterCount;
-   double tReadRetry = (double)LFIntQueue::readRetry() / (double)mReaderCount;
-   double tPopRetry = (double)LFIntQueue::popRetry() / (double)mWriterPassCount;
-   double tPushRetry = (double)LFIntQueue::pushRetry() / (double)mReaderPassCount;
 
    Prn::print(0, "");
    Prn::print(0, "WriterPass         %16.5f", tWriterPass);
    Prn::print(0, "ReaderPass         %16.5f", tReaderPass);
-   Prn::print(0, "writeRetry         %16.5f", tWriteRetry);
-   Prn::print(0, "readRetry          %16.5f", tReadRetry);
-   Prn::print(0, "popRetry           %16.5f", tPopRetry);
-   Prn::print(0, "pushRetry          %16.5f", tPushRetry);
 
    Prn::print(0, "");
    for (int i = 0; i < mNumWriters; i++)

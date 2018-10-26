@@ -35,9 +35,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CCLib\CCLib.vcxproj">
+      <Project>{2ecec11e-b8e9-4a17-a74a-db1147210ff4}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="CmdLineExec.cpp" />
-    <ClCompile Include="LFFreeList.cpp" />
-    <ClCompile Include="LFIntQueue.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainInit.cpp" />
     <ClCompile Include="MainMemory.cpp" />
@@ -53,8 +56,6 @@
     <ClCompile Include="someTesterThread.cpp" />
     <ClCompile Include="someThreads.cpp" />
     <ClCompile Include="someWriter.cpp" />
-    <ClCompile Include="someWriterReader.cpp" />
-    <ClCompile Include="someWriterReaderThread.cpp" />
     <ClCompile Include="someWriterThread.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Timing.cpp" />
@@ -62,9 +63,6 @@
   <ItemGroup>
     <ClInclude Include="CmdLineExec.h" />
     <ClInclude Include="LFBackoff.h" />
-    <ClInclude Include="LFFreeList.h" />
-    <ClInclude Include="LFIndex.h" />
-    <ClInclude Include="LFIntQueue.h" />
     <ClInclude Include="MainInit.h" />
     <ClInclude Include="MainMemory.h" />
     <ClInclude Include="Parms.h" />
@@ -80,16 +78,9 @@
     <ClInclude Include="someTesterThread.h" />
     <ClInclude Include="someThreads.h" />
     <ClInclude Include="someWriter.h" />
-    <ClInclude Include="someWriterReader.h" />
-    <ClInclude Include="someWriterReaderThread.h" />
     <ClInclude Include="someWriterThread.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Timing.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CCLib\CCLib.vcxproj">
-      <Project>{2ecec11e-b8e9-4a17-a74a-db1147210ff4}</Project>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{68a8df77-6489-45bf-bc33-833c07f67a26}</ProjectGuid>

@@ -8,7 +8,6 @@
 //******************************************************************************
 #include "someWriterThread.h"
 #include "someReaderThread.h"
-#include "someWriterReaderThread.h"
 #include "someTesterThread.h"
 #include "someStatusThread.h"
 
@@ -37,7 +36,6 @@ public:
    int mNumWriters;
 
    WriterThread*       mWriterThread[cMaxNumWriters];
-   WriterReaderThread* mWriterReaderThread[cMaxNumWriters];
    ReaderThread*       mReaderThread;
    TesterThread*       mTesterThread;
    StatusThread*       mStatusThread;

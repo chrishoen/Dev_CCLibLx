@@ -10,7 +10,6 @@
 #include "cc_throw.h"
 #include "ccBlockPoolBase.h"
 #include "ccBlockPoolLCFreeList.h"
-#include "ccBlockPoolLFFreeList.h"
 
 #include "ccBlockPool.h"
 
@@ -111,13 +110,6 @@ void createBlockPool(BlockPoolParms* aParms)
          mBlockPool[tPoolIndex]->initialize(tParms);
       }
       break;
-      // Create and initialize the block pool.
-      case cBlockPoolType_LFFreeList :
-      {
-         mBlockPool[tPoolIndex] = new BlockPoolLFFreeList;
-         mBlockPool[tPoolIndex]->initialize(tParms);
-      }
-      break;
       // Error.
       default :
       {
@@ -155,7 +147,7 @@ bool allocateBlockPoolBlock(int aPoolIndex,void** aBlockPointer,BlockHandle* aBl
 
    // Check result.
    if (tSuccess) return true;
-   if (!mBlockPoolParms[aPoolIndex].mNoThrowFlag)
+   if (mBlockPoolParms[aPoolIndex].mThrowFlag)
    {
       printf("ERROR allocate BlockPool EMPTY %d\n", aPoolIndex);
       cc_throw(101);

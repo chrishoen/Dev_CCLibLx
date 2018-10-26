@@ -11,7 +11,6 @@ Description:
 #include "Parms.h"
 #include "someShare.h"
 #include "LFBackoff.h"
-#include "LFIntQueue.h"
 #include "someMyBlockX.h"
 #include "someReader.h"
 
@@ -76,7 +75,7 @@ void Reader::finishTrial()
 
 void Reader::readType1(int aNumReads)
 {
-   LFBackoff tDelayB(gParms.mDelayB1,gParms.mDelayB2);
+   LFBackoff tDelayB(gParms.mDelayB1, gParms.mDelayB2);
 
    for (int i = 0; i < aNumReads; i++)
    {
@@ -84,7 +83,7 @@ void Reader::readType1(int aNumReads)
       int tCount;
 
       mMarkerRead.doStart();
-      tPass = LFIntQueue::tryRead(&tCount);
+      tPass = gShare.mSRSWIntQueue.tryRead(&tCount);
       mMarkerRead.doStop();
 
       tDelayB.delay();
@@ -109,7 +108,7 @@ void Reader::readType1(int aNumReads)
 
 void Reader::readType2(int aNumReads)
 {
-   LFBackoff tDelayB(gParms.mDelayB1,gParms.mDelayB2);
+   LFBackoff tDelayB(gParms.mDelayB1, gParms.mDelayB2);
 
    for (int i = 0; i < aNumReads; i++)
    {
@@ -117,16 +116,18 @@ void Reader::readType2(int aNumReads)
       int tCount;
 
       mMarkerRead.doStart();
-      Class1A* tObject = (Class1A*)gShare.mLFPointerQueue.readPtr();
-      mMarkerRead.doStop();
-      tDelayB.delay();
 
-      tPass = tObject!=0;
+      Class1A* tObject = gShare.mSRSWObjectQueue.startRead();
       if (tObject)
       {
          tCount = tObject->mCode1;
-         delete tObject;
+         gShare.mSRSWObjectQueue.finishRead();
       }
+
+      mMarkerRead.doStop();
+      tPass = tObject != 0;
+
+      tDelayB.delay();
 
       if (tPass)
       {
@@ -148,26 +149,24 @@ void Reader::readType2(int aNumReads)
 
 void Reader::readType3(int aNumReads)
 {
-   LFBackoff tDelayB(gParms.mDelayB1,gParms.mDelayB2);
+   LFBackoff tDelayB(gParms.mDelayB1, gParms.mDelayB2);
 
    for (int i = 0; i < aNumReads; i++)
    {
-      bool tPass;
+      bool tPass = false;
       int tCount;
-      int tIndex;
 
       mMarkerRead.doStart();
 
-      Class1A* tObject = (Class1A*)gShare.mLFObjectQueue.startRead(&tIndex);
+      Class1A* tObject = (Class1A*)gShare.mLCPointerQueue.tryRead();
+
       if (tObject)
       {
          tCount = tObject->mCode1;
-         tDelayB.delay();
-         gShare.mLFObjectQueue.finishRead(tIndex);
+         delete tObject;
+         mMarkerRead.doStop();
+         tPass = true;
       }
-
-      mMarkerRead.doStop();
-      tPass = tObject!=0;
 
       tDelayB.delay();
 
@@ -191,39 +190,6 @@ void Reader::readType3(int aNumReads)
 
 void Reader::readType4(int aNumReads)
 {
-   LFBackoff tDelayB(gParms.mDelayB1,gParms.mDelayB2);
-
-   for (int i = 0; i < aNumReads; i++)
-   {
-      bool tPass;
-      int tCount;
-      MyBlockX* tObject = 0;
-
-      mMarkerRead.doStart();
-      tPass = gShare.mLFValueQueue.tryRead((void**)&tObject);
-      mMarkerRead.doStop();
-      tDelayB.delay();
-
-      if (tObject)
-      {
-         tCount = tObject->mCode1;
-         mMarkerRead.doStart();
-         delete tObject;
-         mMarkerRead.doStop();
-      }
-
-      if (tPass)
-      {
-         mCount++;
-         mPassCount++;
-         mCheckSum += tCount;
-      }
-      else
-      {
-         mCount++;
-         mFailCount++;
-      }
-   }
 }
 
 //******************************************************************************
@@ -232,31 +198,6 @@ void Reader::readType4(int aNumReads)
 
 void Reader::readType5(int aNumReads)
 {
-   LFBackoff tDelayB(gParms.mDelayB1,gParms.mDelayB2);
-
-   for (int i = 0; i < aNumReads; i++)
-   {
-      bool tPass;
-      int tCount;
-
-      mMarkerRead.doStart();
-      tPass = gShare.mLFIntQueue.tryRead(&tCount);
-      mMarkerRead.doStop();
-
-      tDelayB.delay();
-
-      if (tPass)
-      {
-         mCount++;
-         mPassCount++;
-         mCheckSum += tCount;
-      }
-      else
-      {
-         mCount++;
-         mFailCount++;
-      }
-   }
 }
 
 //******************************************************************************
@@ -313,9 +254,9 @@ void Reader::readType7(int aNumReads)
       {
          tCount = tObject->mCode1;
          gShare.mLCObjectQueue.finishRead(tIndex);
+         mMarkerRead.doStop();
       }
 
-      mMarkerRead.doStop();
       tPass = tObject!=0;
 
       tDelayB.delay();
@@ -348,7 +289,7 @@ void Reader::readType8(int aNumReads)
       int tCount;
 
       mMarkerRead.doStart();
-      tPass = gShare.mLMIntQueue.tryRead(&tCount);
+      tPass = gShare.mLCIntQueue.tryRead(&tCount);
       mMarkerRead.doStop();
 
       tDelayB.delay();
@@ -377,11 +318,10 @@ void Reader::readType9(int aNumReads)
 
    for (int i = 0; i < aNumReads; i++)
    {
-      bool tPass;
+      bool tPass = false;
       int tCount;
-      MyBlockX* tObject = 0;
-
-      tPass = gShare.mLMPointerQueue.tryRead((void**)&tObject);
+      
+      MyBlockX* tObject = (MyBlockX*)gShare.mLCPointerQueue.tryRead();
       tDelayB.delay();
 
       if (tObject)
@@ -390,6 +330,7 @@ void Reader::readType9(int aNumReads)
          mMarkerRead.doStart();
          delete tObject;
          mMarkerRead.doStop();
+         tPass = true;
       }
 
       if (tPass)
@@ -412,37 +353,6 @@ void Reader::readType9(int aNumReads)
 
 void Reader::readType10(int aNumReads)
 {
-   LFBackoff tDelayB(gParms.mDelayB1, gParms.mDelayB2);
-
-   for (int i = 0; i < aNumReads; i++)
-   {
-      bool tPass;
-      int tCount;
-      Class1A* tObject = 0;
-
-      tPass = gShare.mLMPointerQueue.tryRead((void**)&tObject);
-      tDelayB.delay();
-
-      if (tObject)
-      {
-         tCount = tObject->mCode1;
-         mMarkerRead.doStart();
-         delete tObject;
-         mMarkerRead.doStop();
-      }
-
-      if (tPass)
-      {
-         mCount++;
-         mPassCount++;
-         mCheckSum += tCount;
-      }
-      else
-      {
-         mCount++;
-         mFailCount++;
-      }
-   }
 }
 
 //******************************************************************************
@@ -472,10 +382,13 @@ void Reader::read(int aNumReads)
 
 void Reader::flushType1()
 {
-   while(true)
+   while (true)
    {
       int tCount;
-      if (!LFIntQueue::tryRead(&tCount)) break;
+      bool tPass;
+      tPass = gShare.mSRSWIntQueue.tryRead(&tCount);
+      if (!tPass) break;
+
       mCount++;
       mPassCount++;
       mCheckSum += tCount;
@@ -488,18 +401,6 @@ void Reader::flushType1()
 
 void Reader::flushType2()
 {
-   while(true)
-   {
-      Class1A* tObject = (Class1A*)gShare.mLFPointerQueue.readPtr();
-      if (!tObject) break;
-
-      int tCount = tObject->mCode1;
-      delete tObject;
-
-      mCount++;
-      mPassCount++;
-      mCheckSum += tCount;
-   }
 }
    
 //******************************************************************************
@@ -508,17 +409,13 @@ void Reader::flushType2()
 
 void Reader::flushType3()
 {
-   int tCount;
-   int tIndex;
-
-   while(true)
+   while (true)
    {
-
-      Class1A* tObject = (Class1A*)gShare.mLFObjectQueue.startRead(&tIndex);
+      Class1A* tObject = (Class1A*)gShare.mLCPointerQueue.tryRead();
       if (!tObject) break;
 
-      tCount = tObject->mCode1;
-      gShare.mLFObjectQueue.finishRead(tIndex);
+      int tCount = tObject->mCode1;
+      delete tObject;
 
       mCount++;
       mPassCount++;
@@ -532,20 +429,6 @@ void Reader::flushType3()
 
 void Reader::flushType4()
 {
-   while(true)
-   {
-      bool tPass;
-      MyBlockX* tObject = 0;
-      tPass = gShare.mLFValueQueue.tryRead((void**)&tObject);
-      if (!tPass) break;
-
-      int tCount = tObject->mCode1;
-      delete tObject;
-
-      mCount++;
-      mPassCount++;
-      mCheckSum += tCount;
-   }
 }
    
 //******************************************************************************
@@ -554,17 +437,6 @@ void Reader::flushType4()
 
 void Reader::flushType5()
 {
-   while(true)
-   {
-      int tCount;
-      bool tPass;
-      tPass = gShare.mLFIntQueue.tryRead(&tCount);
-      if (!tPass) break;
-
-      mCount++;
-      mPassCount++;
-      mCheckSum += tCount;
-   }
 }
    
 //******************************************************************************
@@ -620,7 +492,7 @@ void Reader::flushType8()
    {
       int tCount;
       bool tPass;
-      tPass = gShare.mLMIntQueue.tryRead(&tCount);
+      tPass = gShare.mLCIntQueue.tryRead(&tCount);
       if (!tPass) break;
 
       mCount++;
@@ -637,10 +509,8 @@ void Reader::flushType9()
 {
    while (true)
    {
-      bool tPass;
-      MyBlockX* tObject = 0;
-      tPass = gShare.mLMPointerQueue.tryRead((void**)&tObject);
-      if (!tPass) break;
+      MyBlockX* tObject =  (MyBlockX*)gShare.mLCPointerQueue.tryRead();
+      if (!tObject) break;
 
       int tCount = tObject->mCode1;
       delete tObject;
@@ -657,20 +527,6 @@ void Reader::flushType9()
 
 void Reader::flushType10()
 {
-   while (true)
-   {
-      bool tPass;
-      Class1A* tObject = 0;
-      tPass = gShare.mLMPointerQueue.tryRead((void**)&tObject);
-      if (!tPass) break;
-
-      int tCount = tObject->mCode1;
-      delete tObject;
-
-      mCount++;
-      mPassCount++;
-      mCheckSum += tCount;
-   }
 }
 
 //******************************************************************************

@@ -2,23 +2,20 @@
 
 /*==============================================================================
 
-Value queue that uses critical sections as locks.
-Single Reader Multiple Writer Value Queue class template.
-It is multiple writer single reader thread safe.
-It locks with critcal sections for mutual exclusion, blocking.
+Single Reader Writer Object Queue Class Template. 
+
+It is single writer single reader thread safe.
+It is uses no thread synchronization.
+It is shared memory safe.
+
+This implements a value queue. 
+
+It is thread safe for separate single writer and single reader threads.
 
 ==============================================================================*/
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
-
-#include <stdlib.h>
-#include <new>
-
-#include "ccDefs.h"
-#include "cc_functions.h"
-#include "ccMemoryPtr.h"
-#include "ccCriticalSection.h"
 
 //******************************************************************************
 //******************************************************************************
@@ -26,43 +23,36 @@ It locks with critcal sections for mutual exclusion, blocking.
 
 namespace CC
 {
-//******************************************************************************
-//******************************************************************************
-//******************************************************************************
-// Value queue that uses critical sections as locks.
-// Single reader multiple writer value queue class template.
-// It is multiple writer single reader thread safe.
-// It locks with critcal sections for mutual exclusion, blocking.
 
-template <class Element>
-class LCValueQueue
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
+
+template <class Element,int Size>
+class SRSWObjectQueue
 {
 public:
 
    //***************************************************************************
    //***************************************************************************
    //***************************************************************************
+   // Constants.
+
+   // Number of elements allocated is size + 1. There is an extra element
+   // allocated.
+   static const int cNumElements = Size + 1;
+
+   //***************************************************************************
+   //***************************************************************************
+   //***************************************************************************
    // Members.
 
-   // Array of queue values, storage for the values.
-   // NumElements is Size + 1.
-   // Index range is 0..Size.
-   Element* mElement;
-
-   // Number of elements allocated.
-   int mNumElements;
-
-   // Queue array indices.
+   // Element access indices.
    int mPutIndex;
    int mGetIndex;
 
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Members.
-
-   // Critical section.
-   void* mCriticalSection;
+   // Array of elements.
+   Element mElement[cNumElements];
 
    //***************************************************************************
    //***************************************************************************
@@ -70,53 +60,18 @@ public:
    // Methods.
 
    // Constructor.
-   LCValueQueue()
+   SRSWObjectQueue()
    {
-      mElement = 0;
-      mNumElements = 0;
+      reset();
+   }
+
+   void reset()
+   {
+      // Initialize variables.
       mPutIndex = 0;
       mGetIndex = 0;
-      mCriticalSection = createCriticalSection();
    }
 
-   ~LCValueQueue()
-   {
-      finalize();
-      destroyCriticalSection(mCriticalSection);
-   }
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Initialize.
-
-   void initialize(int aSize)
-   {
-      // Deallocate memory, if any exists.
-      finalize();
-
-      // Allocate for one extra dummy element.
-      mNumElements = aSize + 1;
-      mPutIndex = 0;
-      mGetIndex = 0;
-
-      // Allocate memory for the array.
-      mElement = new Element[mNumElements];
-   }
-
-   //***************************************************************************
-   //***************************************************************************
-   //***************************************************************************
-   // Finalize.
-
-   void finalize()
-   {
-      if (mElement == 0) return;
-      delete mElement;
-      mElement = 0;
-   }
-
-   //***************************************************************************
    //***************************************************************************
    //***************************************************************************
    //***************************************************************************
@@ -126,7 +81,7 @@ public:
    int size()
    {
       int tSize = mPutIndex - mGetIndex;
-      if (tSize < 0) tSize = mNumElements + tSize;
+      if (tSize < 0) tSize = cNumElements + tSize;
       return tSize;
    }
 
@@ -137,41 +92,31 @@ public:
    // then it succeeds.
    // 
    // This tests if put operations are allowed. Puts are allowed if the 
-   // current size is less than or equal to Allocate - 2. If the size is equal
-   // to Allocate - 2 then the next put operation would put the size to
-   // mNumElements - 1, which is the max number of elements. This is the same
+   // current size is less than or equal to NumElements - 2. If the size is equal
+   // to NumElements - 2 then the next put operation would put the size to
+   // cNumElements - 1, which is the max number of elements. This is the same
    // as "is not full".
    // 
    // This puts an element to the queue and advances the put index. It does a 
    // copy from a source element into the queue array element at the put index.
    // It uses a temp index variable so that writing to the index is atomic.
 
-   bool tryWrite (Element aElement)
+   Element* startWrite()
    {
-      // Lock.
-      enterCriticalSection(mCriticalSection);
-
-      // Test if the queue is full.
+      // If the queue is full then return zero.
       int tSize = mPutIndex - mGetIndex;
-      if (tSize < 0) tSize = mNumElements + tSize;
-      if (tSize > mNumElements - 2)
-      {
-         // Unlock.
-         leaveCriticalSection(mCriticalSection);
-         return false;
-      }
+      if (tSize < 0) tSize = cNumElements + tSize;
+      if (tSize > cNumElements - 2) return 0;
 
-      // Local put index.
+      // Return a pointer to the element at the put index.
+      return &mElement[mPutIndex];
+   }
+
+   void finishWrite()
+   {
       int tPutIndex = mPutIndex;
-      // Copy the source element into the element at the queue put index
-      mElement[tPutIndex] = aElement;
-      // Advance the put index.
-      if(++tPutIndex == mNumElements) tPutIndex = 0;
+      if (++tPutIndex == cNumElements) tPutIndex = 0;
       mPutIndex = tPutIndex;
-
-      // Unlock.
-      leaveCriticalSection(mCriticalSection);
-      return true;
    }
 
    //***************************************************************************
@@ -185,23 +130,24 @@ public:
    // element. It uses a temp index variable so that writing to the index is
    // atomic. Note that the destination element must be of element size.
   
-   bool tryRead(Element* aValue)
+   Element* startRead()
    {
-      // Test if the queue is empty.
+      // If the queue is empty then return zero.
       int tSize = mPutIndex - mGetIndex;
-      if (tSize < 0) tSize = mNumElements + tSize;
-      if (tSize == 0) return false;
+      if (tSize < 0) tSize = cNumElements + tSize;
+      if (tSize == 0) return 0;
 
-      // Local index
+      // Return a pointer to the element at the get index.
+      return &mElement[mGetIndex];
+   }
+
+   void finishRead()
+   {
+      // Local index.
       int tGetIndex = mGetIndex;
-      // Copy the queue array element at the get index
-      *aValue = mElement[tGetIndex];
-      // Advance the get index
-      if(++tGetIndex == mNumElements) tGetIndex = 0;
+      // Advance the get index.
+      if (++tGetIndex == cNumElements) tGetIndex = 0;
       mGetIndex = tGetIndex;
-
-      // Done.
-      return true;
    }
 };
 

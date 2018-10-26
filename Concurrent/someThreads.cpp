@@ -32,7 +32,6 @@ void Threads::reset()
    for (int i = 0; i < cMaxNumWriters; i++)
    {
       mWriterThread[i] = 0;
-      mWriterReaderThread[i] = 0;
    }
 
    mReaderThread=0;
@@ -68,17 +67,6 @@ void Threads::start1()
 
 void Threads::start2()
 {
-   Prn::print(0,"Threads::start2*******************************");
-   reset();
-
-   for (int i = 0; i < mNumWriters; i++)
-   {
-      mWriterReaderThread[i] = new WriterReaderThread(i);
-      mWriterReaderThread[i]->launchThread();
-   }
-
-   mStatusThread = new StatusThread;
-   mStatusThread->launchThread();
 }
 
 //******************************************************************************
@@ -139,27 +127,6 @@ void Threads::stop1()
 
 void Threads::stop2()
 {
-   Prn::print(0,"Threads::stopping2****************************");
-   Prn::print(0,"");
-
-   if (mStatusThread)
-   {
-      mStatusThread->shutdownThread();
-      delete mStatusThread;
-      mStatusThread = 0;
-   }
-
-   for (int i = 0; i < mNumWriters; i++)
-   {
-      if (mWriterReaderThread[i])
-      {
-         mWriterReaderThread[i]->shutdownThread();
-         delete mWriterReaderThread[i];
-         mWriterReaderThread[i] = 0;
-      }
-   }
-
-   Prn::print(0,"Threads::stopped2*****************************");
 }
 
 //******************************************************************************

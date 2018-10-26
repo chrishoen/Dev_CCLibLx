@@ -10,8 +10,6 @@ Description:
 
 #include "Parms.h"
 #include "LFBackoff.h"
-#include "LFFreeList.h"
-#include "LFIntQueue.h"
 #include "someShare.h"
 #include "someTester.h"
 

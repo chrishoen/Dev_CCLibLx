@@ -2,8 +2,6 @@
 
 #include "risTimeMarker.h"
 #include "Parms.h"
-#include "LFFreeList.h"
-#include "LFIntQueue.h"
 #include "LFBackoff.h"
 #include "Timing.h"
 
@@ -202,8 +200,6 @@ namespace Timing
 
    void test15()
    {
-      LFIntQueue::tryWrite(++mWriteCount);
-      LFIntQueue::tryRead(&mReadCount);
    }
 
    void test16()
@@ -217,24 +213,10 @@ namespace Timing
 
    void test21()
    {
-      mMarkerWrite.doStart();
-      LFIntQueue::tryWrite(++mWriteCount);
-      mMarkerWrite.doStop();
-
-      mMarkerRead.doStart();
-      LFIntQueue::tryRead(&mReadCount);
-      mMarkerRead.doStop();
    }
 
    void test22()
    {
-      mMarkerWrite.doStart();
-      LFIntQueue::tryWrite(++mWriteCount);
-      mMarkerWrite.doStop();
-
-      mMarkerRead.doStart();
-      LFIntQueue::tryRead(&mReadCount);
-      mMarkerRead.doStop();
    }
 
    //***************************************************************************
@@ -244,19 +226,6 @@ namespace Timing
 
    void test81()
    {
-      int tNode;
-      bool tPass;
-
-      mMarkerPop.doStart();
-      tPass = LFFreeList::listPop(&tNode);
-      mMarkerPop.doStop();
-
-      if (tPass)
-      {
-         mMarkerPush.doStart();
-         LFFreeList::listPush(tNode);
-         mMarkerPush.doStop();
-      }
    }
 
 //***************************************************************************

@@ -1,5 +1,4 @@
-#ifndef _LFBACKOFF_H_
-#define _LFBACKOFF_H_
+#pragma once
 
 #include <math.h>
 #include "my_functions.h"
@@ -151,7 +150,4 @@ public:
       for (int i=0;i<tLoop;i++) tDummy++;
    }
 };
-
-
-#endif
 

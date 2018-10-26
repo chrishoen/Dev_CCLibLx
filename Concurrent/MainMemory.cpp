@@ -29,7 +29,7 @@ void main_memory_initialize()
    tBlockPoolParms.mBlockPoolType = CC::cBlockPoolType_LCFreeList;
    tBlockPoolParms.mNumBlocks     = gParms.mNumElements;
    tBlockPoolParms.mBlockSize     = sizeof(Some::MyBlockX);
-   tBlockPoolParms.mNoThrowFlag   = true;
+   tBlockPoolParms.mThrowFlag     = false;
    CC::createBlockPool(&tBlockPoolParms);
 }
 

@@ -41,7 +41,7 @@ void BlockPoolParms::reset()
    mNumBlocks        = 0;
    mBlockSize        = 0;
    mMemory           = 0;
-   mNoThrowFlag      = false;
+   mThrowFlag        = false;
 
    mBlockBoxSize     = 0;
    mBlockHeaderSize  = 0;
