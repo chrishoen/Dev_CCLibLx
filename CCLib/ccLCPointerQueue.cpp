@@ -30,13 +30,22 @@ namespace CC
 LCPointerQueue::LCPointerQueue()
 {
    mElement = 0;
+   mCriticalSection = createCriticalSection();
+   resetVariables();
+}
+
+void LCPointerQueue::resetVariables()
+{
    mNumElements = 0;
    mPutIndex = 0;
    mGetIndex = 0;
-   mCriticalSection = createCriticalSection();
+   mWritePass = 0;
+   mWriteFail = 0;
+   mReadPass = 0;
+   mReadFail = 0;
 }
 
-LCPointerQueue::~LCPointerQueue()
+   LCPointerQueue::~LCPointerQueue()
 {
    finalize();
    destroyCriticalSection(mCriticalSection);
@@ -52,10 +61,11 @@ void LCPointerQueue::initialize(int aSize)
    // Deallocate memory, if any exists.
    finalize();
 
+   // Initialize.
+   resetVariables();
+
    // Allocate for one extra dummy element.
    mNumElements = aSize + 1;
-   mPutIndex = 0;
-   mGetIndex = 0;
 
    // Allocate memory for the array.
    mElement = new void*[mNumElements];
@@ -91,6 +101,19 @@ int LCPointerQueue::size()
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
+// Show the metrics.
+
+void LCPointerQueue::show(char* aLabel)
+{
+   printf("LCPointerQueue %s WritePass  %d\n", aLabel, mWritePass);
+   printf("LCPointerQueue %s WriteFail  %d\n", aLabel, mWriteFail);
+   printf("LCPointerQueue %s ReadPass   %d\n",  aLabel, mReadPass);
+   printf("LCPointerQueue %s ReadPass   %d\n",  aLabel, mReadFail);
+}
+
+//******************************************************************************
+//******************************************************************************
+//******************************************************************************
 // Try to write a pointer to the queue. Return true if successful. 
 // Return false if the queue is full.
 //
@@ -112,13 +135,14 @@ bool LCPointerQueue::tryWrite (void* aElement)
    // Lock.
    enterCriticalSection(mCriticalSection);
 
-   // Test if the queue is full.
+   // Exit if the queue is full.
    int tSize = mPutIndex - mGetIndex;
    if (tSize < 0) tSize = mNumElements + tSize;
    if (tSize > mNumElements - 2)
    {
       // Unlock.
       leaveCriticalSection(mCriticalSection);
+      mWriteFail++;
       return false;
    }
 
@@ -132,6 +156,9 @@ bool LCPointerQueue::tryWrite (void* aElement)
 
    // Unlock.
    leaveCriticalSection(mCriticalSection);
+
+   // Done.
+   mWritePass++;
    return true;
 }
 
@@ -151,10 +178,14 @@ bool LCPointerQueue::tryWrite (void* aElement)
   
 void* LCPointerQueue::tryRead()
 {
-   // Test if the queue is empty.
+   // Exit if the queue is empty.
    int tSize = mPutIndex - mGetIndex;
    if (tSize < 0) tSize = mNumElements + tSize;
-   if (tSize == 0) return 0;
+   if (tSize == 0)
+   {
+      mReadFail++;
+      return 0;
+   }
 
    // Local index.
    int tGetIndex = mGetIndex;
@@ -165,6 +196,7 @@ void* LCPointerQueue::tryRead()
    mGetIndex = tGetIndex;
 
    // Done.
+   mReadPass++;
    return tValue;
 }
 
